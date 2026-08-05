@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ProBid HQ — Electrical Estimating</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap">
+<style>
+/* ─── TOKENS ─── */
+:root{
+  --bg:#080a0c;--bg2:#0f1114;--bg3:#161a1e;--bg4:#1e2328;--bg5:#252b32;
+  --bd:#282e36;--bd2:#343c46;
+  --tx:#dde3ec;--tx2:#8c97a8;--tx3:#4f5c6b;
+  --gr:#00d97e;--gr2:#00f08a;--gr3:#007a46;--grb:rgba(0,217,126,.1);--grb2:rgba(0,217,126,.06);
+  --am:#ffb800;--amb:rgba(255,184,0,.1);
+  --re:#ff4d6a;--reb:rgba(255,77,106,.1);
+  --bl:#4d9fff;--blb:rgba(77,159,255,.1);
+  --pu:#a78bfa;--pub:rgba(167,139,250,.1);
+  --or:#ff8c42;--orb:rgba(255,140,66,.1);
+  --font-display:'Syne',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'DM Mono',monospace;
+  --r4:4px;--r8:8px;--r12:12px;--r16:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--font-body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px}
+
+/* ─── NAV ─── */
+.nav{position:sticky;top:0;z-index:200;background:rgba(8,10,12,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);display:flex;align-items:center;height:50px;padding:0 1rem;gap:2px}
+.logo{font-family:var(--font-display);font-size:.95rem;font-weight:800;color:var(--gr);letter-spacing:-.02em;margin-right:1rem;display:flex;align-items:center;gap:.4rem;white-space:nowrap}
+.logo-tag{font-size:.55rem;font-family:var(--font-mono);background:var(--gr3);color:#000;border-radius:3px;padding:1px 5px;letter-spacing:.06em;font-weight:500}
+.ni{border:none;background:none;color:var(--tx3);padding:.45rem .8rem;border-radius:var(--r8);cursor:pointer;font-size:.76rem;font-family:var(--font-body);font-weight:500;display:flex;align-items:center;gap:.3rem;transition:all .12s;white-space:nowrap}
+.ni:hover{color:var(--tx2);background:var(--bg3)}
+.ni.act{color:var(--gr);background:var(--grb)}
+.ni svg{width:13px;height:13px;flex-shrink:0}
+.nav-gap{flex:1}
+.conn{display:flex;align-items:center;gap:.35rem;font-size:.72rem;font-family:var(--font-mono);color:var(--tx3)}
+.cdot{width:6px;height:6px;border-radius:50%;background:var(--re);transition:background .3s;flex-shrink:0}
+.cdot.on{background:var(--gr)}
+
+/* ─── SCREENS ─── */
+.scr{display:none;max-width:1180px;margin:0 auto;padding:1.25rem 1rem 4rem}
+.scr.act{display:block}
+
+/* ─── TRACKING BAR ─── */
+.track-bar{background:linear-gradient(90deg,var(--blb),transparent);border:1px solid var(--bl);border-radius:var(--r8);padding:.5rem 1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.9rem;font-size:.75rem;color:var(--bl)}
+.track-bar.hidden{display:none}
+.tdot{width:7px;height:7px;border-radius:50%;background:var(--bl);animation:blink .9s ease infinite;flex-shrink:0}
+@keyframes blink{50%{opacity:.3}}
+.ttimer{font-family:var(--font-mono);font-size:.82rem;font-weight:500;margin-left:auto}
+
+/* ─── ESTIMATE LAYOUT ─── */
+.est-grid{display:grid;grid-template-columns:300px 1fr;gap:.9rem;align-items:start}
+@media(max-width:780px){.est-grid{grid-template-columns:1fr}}
+
+/* ─── PANEL ─── */
+.panel{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r16);padding:1.1rem;position:sticky;top:62px}
+.panel-hd{font-family:var(--font-mono);font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:.9rem}
+
+/* ─── FORM ELEMENTS ─── */
+.frow{margin-bottom:.7rem}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin-bottom:.7rem}
+.lbl{font-size:.72rem;font-weight:600;color:var(--tx2);display:block;margin-bottom:.28rem;letter-spacing:.01em}
+.inp{width:100%;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r8);padding:.52rem .7rem;color:var(--tx);font-size:.82rem;font-family:var(--font-body);outline:none;transition:border-color .12s,background .12s}
+.inp:focus{border-color:var(--gr3);background:var(--bg4)}
+.inp::placeholder{color:var(--tx3)}
+select.inp{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234f5c6b'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .6rem center;padding-right:1.6rem}
+textarea.inp{resize:vertical;min-height:80px}
+.hint{font-size:.68rem;color:var(--tx3);margin-top:.25rem;line-height:1.5}
+
+/* ─── BUTTONS ─── */
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.55rem 1.1rem;border-radius:var(--r8);border:none;font-size:.8rem;font-family:var(--font-body);font-weight:600;cursor:pointer;transition:all .12s;white-space:nowrap}
+.btn-primary{background:var(--gr);color:#000}
+.btn-primary:hover{background:var(--gr2)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-ghost{background:var(--bg3);color:var(--tx2);border:1px solid var(--bd)}
+.btn-ghost:hover{color:var(--tx);border-color:var(--bd2)}
+.btn-sm{padding:.38rem .75rem;font-size:.74rem}
+.gen-btn{width:100%;padding:.7rem;background:var(--gr);color:#000;border:none;border-radius:var(--r8);font-size:.85rem;font-family:var(--font-display);font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.45rem;transition:all .12s;margin-top:.4rem;letter-spacing:-.01em}
+.gen-btn:hover{background:var(--gr2);transform:translateY(-1px)}
+.gen-btn:disabled{opacity:.45;transform:none;cursor:not-allowed}
+
+/* ─── OUTPUT PANEL ─── */
+.out-panel{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r16);padding:1.25rem;min-height:400px}
+.out-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:350px;gap:.6rem;color:var(--tx3);text-align:center;padding:2rem}
+.out-empty-ico{font-size:2.2rem;opacity:.25}
+.out-empty-t{font-size:.85rem;font-weight:600;color:var(--tx2)}
+.out-empty-d{font-size:.74rem;max-width:300px;line-height:1.6}
+.out-load{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:350px;gap:.8rem}.out-load.hidden{display:none}
+.spin{width:28px;height:28px;border:2.5px solid var(--bd);border-top-color:var(--gr);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-msg{font-size:.74rem;font-family:var(--font-mono);color:var(--tx3)}
+.out-head{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem}
+.out-title{font-family:var(--font-display);font-size:1rem;font-weight:700;letter-spacing:-.02em}
+.out-meta{font-size:.7rem;color:var(--tx3);margin-top:.2rem;font-family:var(--font-mono)}
+.out-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.35rem}
+.tag{font-size:.62rem;padding:2px 7px;border-radius:3px;font-family:var(--font-mono);font-weight:500}
+.tag-live{background:var(--grb);color:var(--gr);border:1px solid var(--gr3)}
+.tag-std{background:var(--bg4);color:var(--tx3);border:1px solid var(--bd)}
+.tag-disc{background:var(--amb);color:var(--am);border:1px solid rgba(255,184,0,.2)}
+.price-card{background:linear-gradient(135deg,#00291a 0%,#001f14 100%);border:1px solid var(--gr3);border-radius:var(--r12);padding:1rem 1.2rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem}
+.pc-left .pc-label{font-size:.65rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:rgba(0,217,126,.5);margin-bottom:.1rem}
+.pc-value{font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--gr);letter-spacing:-.04em;line-height:1}
+.pc-hrs{font-size:.72rem;color:rgba(0,217,126,.5);margin-top:.2rem;font-family:var(--font-mono)}
+.pc-right{text-align:right;font-size:.72rem;font-family:var(--font-mono);color:rgba(0,217,126,.6);display:flex;flex-direction:column;gap:.15rem}
+
+/* ─── LINE TABLE ─── */
+.lt{width:100%;border-collapse:collapse;font-size:.76rem;margin-bottom:.9rem}
+.lt th{text-align:left;padding:.38rem .5rem;font-size:.65rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);border-bottom:1px solid var(--bd);font-weight:500}
+.lt td{padding:.42rem .5rem;border-bottom:1px solid rgba(40,46,54,.5);vertical-align:top}
+.lt tr:last-child td{border-bottom:none}
+.lt-num{font-family:var(--font-mono);text-align:right;color:var(--tx2)}
+.lt-bold{font-family:var(--font-mono);text-align:right;font-weight:500}
+.conf-h{color:var(--gr);font-size:.65rem;font-weight:500}
+.conf-m{color:var(--am);font-size:.65rem;font-weight:500}
+.conf-l{color:var(--re);font-size:.65rem;font-weight:500}
+.lt-note{font-size:.65rem;color:var(--tx3);margin-top:.1rem}
+.tot-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.9rem}
+.tot-item{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r8);padding:.55rem .75rem}
+.tot-lbl{font-size:.65rem;font-family:var(--font-mono);color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.15rem}
+.tot-val{font-size:.88rem;font-weight:600;font-family:var(--font-mono)}
+
+/* ─── JOB COSTING BLOCK ─── */
+.jc-block{margin-top:.9rem;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r12);padding:1rem}
+.jc-hd{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem}
+.jc-title{font-size:.72rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);font-weight:500}
+.jc-badge{font-size:.6rem;background:var(--grb);color:var(--gr);border:1px solid var(--gr3);border-radius:3px;padding:1px 6px;font-family:var(--font-mono);font-weight:500}
+.jc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:.75rem}
+.jcs{background:var(--bg4);border:1px solid var(--bd);border-radius:var(--r8);padding:.5rem .65rem}
+.jcs-lbl{font-size:.62rem;font-family:var(--font-mono);color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.12rem}
+.jcs-val{font-size:.85rem;font-weight:600;font-family:var(--font-mono)}
+.jcs-val.pos{color:var(--gr)}.jcs-val.neg{color:var(--re)}.jcs-val.neu{color:var(--tx2)}
+.jc-actions{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:.75rem}
+.jca-btn{display:flex;align-items:center;gap:.3rem;padding:.38rem .8rem;border-radius:var(--r8);font-size:.73rem;font-family:var(--font-body);font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--bg4);color:var(--tx2);transition:all .12s}
+.jca-btn:hover{color:var(--tx);border-color:var(--bd2)}
+.jca-gps{}.jca-gps:hover{border-color:var(--bl);color:var(--bl)}.jca-gps.active{border-color:var(--bl);color:var(--bl);background:var(--blb)}
+.jca-cam:hover{border-color:var(--am);color:var(--am)}
+.jca-mic:hover{border-color:var(--pu);color:var(--pu)}.jca-mic.recording{border-color:var(--re);color:var(--re);animation:blink .7s ease infinite}
+.log-list{display:flex;flex-direction:column;gap:.35rem;max-height:160px;overflow-y:auto}
+.log-entry{display:flex;align-items:center;gap:.5rem;background:var(--bg4);border:1px solid var(--bd);border-radius:var(--r4);padding:.35rem .6rem;font-size:.72rem}
+.log-tag{font-size:.6rem;padding:1px 5px;border-radius:3px;font-family:var(--font-mono);font-weight:500;flex-shrink:0}
+.lt-gps{background:var(--blb);color:var(--bl)}.lt-mat{background:var(--amb);color:var(--am)}.lt-voice{background:var(--pub);color:var(--pu)}
+.log-text{flex:1;color:var(--tx2)}
+.log-date{font-size:.62rem;color:var(--tx3);font-family:var(--font-mono);flex-shrink:0}
+
+/* ─── WIN/LOSS ─── */
+.wl-row{display:flex;gap:.45rem;margin-top:.75rem}
+.wl-btn{flex:1;padding:.45rem;border:1px solid var(--bd);border-radius:var(--r8);font-size:.73rem;font-family:var(--font-body);font-weight:600;cursor:pointer;background:none;color:var(--tx3);transition:all .12s;display:flex;align-items:center;justify-content:center;gap:.35rem}
+.wl-btn.won{background:var(--grb);border-color:var(--gr3);color:var(--gr)}
+.wl-btn.lost{background:var(--reb);border-color:var(--re);color:var(--re)}
+.wl-btn:hover{border-color:var(--bd2);color:var(--tx)}
+
+/* ─── RECEIPT MODAL ─── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+.modal-bg.hidden{display:none}
+.modal{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r16);padding:1.5rem;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.modal-title{font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:.2rem}
+.modal-sub{font-size:.75rem;color:var(--tx2);margin-bottom:1.2rem;line-height:1.5}
+.modal-load{display:flex;align-items:center;gap:.75rem;color:var(--tx2);font-size:.8rem;padding:.5rem 0}
+.ri-list{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1rem}
+.ri-row{display:grid;grid-template-columns:1fr auto 140px;gap:.45rem;align-items:center;font-size:.78rem;padding:.35rem 0;border-bottom:1px solid var(--bd)}
+.ri-row:last-child{border-bottom:none}
+.ri-name{color:var(--tx);font-weight:500}
+.ri-qty{font-size:.68rem;color:var(--tx3);font-family:var(--font-mono)}
+.ri-price{color:var(--am);font-weight:600;font-family:var(--font-mono);text-align:right}
+.ri-sel{background:var(--bg3);border:1px solid var(--bd);color:var(--tx);border-radius:var(--r4);padding:.28rem .5rem;font-size:.7rem;font-family:var(--font-body);outline:none}
+.modal-footer{display:flex;gap:.45rem;justify-content:flex-end;margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--bd)}
+
+/* ─── HISTORY ─── */
+.hist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:.75rem}
+.hcard{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r12);padding:1rem;cursor:pointer;transition:border-color .12s,transform .1s}
+.hcard:hover{border-color:var(--gr3);transform:translateY(-1px)}
+.hc-row1{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.3rem}
+.hc-title{font-family:var(--font-display);font-size:.88rem;font-weight:700;letter-spacing:-.02em;flex:1;margin-right:.5rem}
+.hc-price{font-family:var(--font-mono);font-weight:600;color:var(--gr);font-size:.88rem;white-space:nowrap}
+.hc-meta{font-size:.68rem;font-family:var(--font-mono);color:var(--tx3);margin-bottom:.4rem}
+.hc-scope{font-size:.72rem;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.5rem}
+.hc-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.3rem}
+.badge{font-size:.62rem;padding:2px 7px;border-radius:3px;font-family:var(--font-mono);font-weight:500}
+.b-pend{background:var(--bg4);color:var(--tx3);border:1px solid var(--bd)}
+.b-won{background:var(--grb);color:var(--gr);border:1px solid var(--gr3)}
+.b-lost{background:var(--reb);color:var(--re);border:1px solid rgba(255,77,106,.2)}
+.hc-data{font-size:.65rem;font-family:var(--font-mono);color:var(--bl)}
+.no-hist{color:var(--tx3);text-align:center;padding:3rem 1rem;font-size:.82rem}
+
+/* ─── DATA MOAT ─── */
+.moat-hero{background:linear-gradient(135deg,var(--grb2),transparent);border:1px solid var(--gr3);border-radius:var(--r12);padding:1rem 1.2rem;margin-bottom:1rem}
+.moat-h{font-family:var(--font-display);font-size:.88rem;font-weight:700;color:var(--gr);margin-bottom:.3rem}
+.moat-d{font-size:.75rem;color:var(--tx2);line-height:1.6}
+.dm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.6rem;margin-bottom:1rem}
+.dm-stat{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r12);padding:.9rem 1rem}
+.dm-val{font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--gr);letter-spacing:-.04em;line-height:1}
+.dm-lbl{font-size:.7rem;color:var(--tx2);margin-top:.25rem;font-family:var(--font-mono)}
+.dm-sub{font-size:.62rem;color:var(--tx3);margin-top:.08rem;font-family:var(--font-mono)}
+.jt-list{display:flex;flex-direction:column;gap:.4rem}
+.jt-row{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r8);padding:.55rem .8rem;font-size:.75rem}
+.jt-name{font-weight:500}
+.jt-right{display:flex;gap:.6rem;font-family:var(--font-mono);font-size:.7rem;color:var(--tx3)}
+
+/* ─── CALIBRATION ─── */
+.cal-list{display:flex;flex-direction:column;gap:.7rem}
+.cal-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r12);padding:1rem 1.1rem}
+.cal-n{font-size:.65rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);margin-bottom:.4rem}
+.cal-test-wrap{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
+.ctj{padding:.35rem .75rem;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r8);font-size:.73rem;cursor:pointer;color:var(--tx2);font-family:var(--font-body);transition:all .12s}
+.ctj:hover{border-color:var(--gr3);color:var(--gr)}
+.cal-2col{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin-top:.55rem}
+.cal-result{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r8);padding:.75rem;margin-top:.55rem;font-size:.78rem;display:none;line-height:1.6}
+.cal-result.show{display:block}
+
+/* ─── SETTINGS ─── */
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+@media(max-width:600px){.set-grid{grid-template-columns:1fr}}
+.set-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r12);padding:1rem 1.1rem}
+.set-hd{font-family:var(--font-mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:.85rem;font-weight:500}
+
+/* ─── SECTION HEADER ─── */
+.s-hd{margin-bottom:1.1rem}
+.s-hd-title{font-family:var(--font-display);font-size:1.1rem;font-weight:700;letter-spacing:-.03em}
+.s-hd-desc{font-size:.75rem;color:var(--tx2);margin-top:.2rem}
+
+/* ─── SETUP ─── */
+.setup-wrap{max-width:480px;margin:2.5rem auto}
+.setup-logo{font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--gr);letter-spacing:-.05em;margin-bottom:.3rem}
+.setup-sub{font-size:.82rem;color:var(--tx2);margin-bottom:1.5rem;line-height:1.6}
+.setup-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r16);padding:1.2rem;margin-bottom:.75rem}
+.setup-card-title{font-size:.82rem;font-weight:600;margin-bottom:.55rem;display:flex;align-items:center;gap:.4rem}
+.optional-pill{font-size:.6rem;background:var(--grb);color:var(--gr);border:1px solid var(--gr3);border-radius:3px;padding:1px 6px;font-family:var(--font-mono)}
+
+/* ─── TOAST ─── */
+.toast-wrap{position:fixed;bottom:1.1rem;right:1.1rem;z-index:999;display:flex;flex-direction:column;gap:.4rem;max-width:320px}
+.toast{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r8);padding:.5rem .9rem;font-size:.76rem;font-family:var(--font-body);display:flex;align-items:center;gap:.5rem;box-shadow:0 8px 32px rgba(0,0,0,.4);animation:tslide .2s ease;line-height:1.4}
+@keyframes tslide{from{transform:translateX(calc(100% + 1.1rem));opacity:0}}
+.toast.ok{border-color:var(--gr3);color:var(--gr)}
+.toast.err{border-color:var(--re);color:var(--re)}
+.toast.info{border-color:var(--bl);color:var(--bl)}
+
+/* ─── MISC ─── */
+.sr-info{font-size:.68rem;color:var(--tx3);padding:.4rem .6rem;background:var(--bg3);border-radius:var(--r4);border:1px solid var(--bd);margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem}
+#receiptFile{display:none}
+
+/* FOLLOW-UP & MATERIAL LIST */
+.btn-or{background:var(--orb);color:var(--or);border:1px solid rgba(255,140,66,.3)}.btn-or:hover{background:rgba(255,140,66,.2)}
+.fu-block{background:linear-gradient(135deg,rgba(255,140,66,.06),transparent);border:1px solid rgba(255,140,66,.25);border-radius:var(--r12);padding:1rem 1.1rem;margin-top:.9rem}
+.fu-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem}
+.fu-title{font-size:.68rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--or);font-weight:500}
+.fu-tabs{display:flex;gap:.3rem;margin-bottom:.65rem}
+.fu-tab{padding:.28rem .65rem;border-radius:var(--r4);font-size:.71rem;font-family:var(--font-body);font-weight:600;cursor:pointer;border:1px solid var(--bd);background:none;color:var(--tx3);transition:all .12s}
+.fu-tab.act{background:var(--orb);color:var(--or);border-color:rgba(255,140,66,.35)}
+.fu-content{display:none}.fu-content.act{display:block}
+.msg-preview{background:var(--bg4);border:1px solid var(--bd);border-radius:var(--r8);padding:.7rem .85rem;font-size:.75rem;line-height:1.65;color:var(--tx2);margin-bottom:.55rem;white-space:pre-wrap;max-height:180px;overflow-y:auto}
+.fu-score{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.6rem}
+.fu-score-btn{padding:.3rem .65rem;border-radius:var(--r4);font-size:.7rem;cursor:pointer;border:1px solid var(--bd);background:none;color:var(--tx3);font-family:var(--font-body);font-weight:500;transition:all .12s}
+.fu-score-btn.hot{background:var(--grb);color:var(--gr);border-color:var(--gr3)}
+.fu-score-btn.warm{background:var(--amb);color:var(--am);border-color:rgba(255,184,0,.3)}
+.fu-score-btn.cold{background:var(--reb);color:var(--re);border-color:rgba(255,77,106,.22)}
+.fu-log{display:flex;flex-direction:column;gap:.25rem;margin-top:.55rem;max-height:100px;overflow-y:auto}
+.fu-log-entry{font-size:.68rem;color:var(--tx3);display:flex;gap:.4rem;align-items:center}
+.fu-log-dot{width:5px;height:5px;border-radius:50%;background:var(--or);flex-shrink:0}
+.fu-pipeline{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1rem}
+.fu-col{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r12);padding:.8rem}
+.fu-col-hd{font-size:.62rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between}
+.fu-col-count{background:var(--bg3);border:1px solid var(--bd);border-radius:3px;padding:1px 5px;font-family:var(--font-mono);font-size:.58rem;color:var(--tx2)}
+.fu-card{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r8);padding:.48rem .58rem;margin-bottom:.28rem;cursor:pointer;transition:border-color .1s}
+.fu-card:hover{border-color:var(--bd2)}.fu-card-name{font-size:.73rem;font-weight:600;margin-bottom:.08rem}
+.fu-card-price{font-family:var(--font-mono);font-size:.68rem;color:var(--gr)}.fu-card-meta{font-size:.62rem;color:var(--tx3);font-family:var(--font-mono)}
+.fu-empty{font-size:.68rem;color:var(--tx3);padding:.25rem 0;text-align:center}
+.mat-list-block{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r12);padding:.82rem .95rem;margin-bottom:.82rem}
+.ml-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+.ml-title{font-size:.67rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--tx2);font-weight:500}
+.ml-items{display:flex;flex-direction:column;gap:.22rem}
+.ml-item{display:flex;align-items:center;gap:.42rem;font-size:.73rem;padding:.22rem 0}
+.ml-check{width:15px;height:15px;border:1.5px solid var(--bd2);border-radius:3px;background:var(--bg4);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.ml-check.checked{background:var(--gr);border-color:var(--gr)}
+.ml-name{flex:1;color:var(--tx)}.ml-price{font-family:var(--font-mono);font-size:.66rem;color:var(--am);white-space:nowrap}
+.ml-bar{height:3px;background:var(--bg4);border-radius:2px;margin-top:.2rem;overflow:hidden}
+.ml-bar-fill{height:100%;background:var(--gr);border-radius:2px;transition:width .3s}
+.cust-section{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r8);padding:.62rem .72rem;margin-bottom:.62rem}
+.b-fu{background:var(--orb);color:var(--or);border:1px solid rgba(255,140,66,.3)}
+
+/* ── DRIP SEQUENCE ── */
+.drip-badge{position:relative;display:inline-flex}
+.drip-dot{position:absolute;top:-4px;right:-6px;width:8px;height:8px;border-radius:50%;background:var(--or);border:2px solid var(--bg);animation:blink .9s ease infinite}
+.due-bar{background:linear-gradient(90deg,rgba(255,140,66,.1),transparent);border:1px solid rgba(255,140,66,.28);border-radius:var(--r8);padding:.55rem 1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.85rem;font-size:.73rem;color:var(--or)}
+.due-bar.hidden{display:none}
+.due-count{font-family:var(--font-mono);font-weight:700;font-size:.9rem;color:var(--or)}
+.seq-block{margin-top:.9rem}
+.seq-title{font-size:.65rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:.55rem;font-weight:500}
+.seq-steps{display:flex;flex-direction:column;gap:.3rem}
+.seq-step{display:flex;align-items:center;gap:.7rem;padding:.45rem .65rem;border-radius:var(--r8);border:1px solid var(--bd);background:var(--bg4);font-size:.72rem;transition:border-color .12s}
+.seq-step.due{border-color:rgba(255,140,66,.45);background:rgba(255,140,66,.06)}
+.seq-step.sent{opacity:.42}
+.seq-step.skipped{opacity:.32}
+.ss-day{font-family:var(--font-mono);font-size:.65rem;color:var(--tx3);width:38px;flex-shrink:0}
+.ss-day.due{color:var(--or);font-weight:700}
+.ss-channel{font-size:.62rem;padding:2px 6px;border-radius:3px;font-family:var(--font-mono);font-weight:500;flex-shrink:0}
+.ch-sms{background:var(--grb);color:var(--gr);border:1px solid var(--gr3)}
+.ch-email{background:var(--blb);color:var(--bl);border:1px solid rgba(77,159,255,.25)}
+.ss-label{flex:1;color:var(--tx2)}
+.ss-status{font-size:.62rem;font-family:var(--font-mono);color:var(--tx3)}
+.ss-status.due{color:var(--or);font-weight:600}
+.ss-status.sent{color:var(--gr)}
+.ss-actions{display:flex;gap:.3rem;margin-top:.45rem;flex-wrap:wrap}
+.fu-pipeline{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1rem}
+@media(max-width:700px){.fu-pipeline{grid-template-columns:1fr}}
+
+/* ── ESTIMATE LOCK ── */
+.lock-bar{display:flex;align-items:center;gap:.65rem;padding:.55rem .9rem;border-radius:var(--r8);margin-bottom:.85rem;font-size:.73rem;font-weight:600}
+.lock-bar.locked{background:var(--grb);border:1px solid var(--gr3);color:var(--gr)}
+.lock-bar.unlocked{background:var(--bg3);border:1px solid var(--bd);color:var(--tx3)}
+.lock-ico{font-size:1rem;flex-shrink:0}
+.lock-detail{font-size:.65rem;font-weight:400;opacity:.75;margin-left:.2rem}
+.lock-ver{font-family:var(--font-mono);font-size:.6rem;background:var(--bg4);padding:2px 6px;border-radius:3px;margin-left:auto;color:var(--tx3)}
+</style>
+</head>
+<body>
+
+<!-- RECEIPT FILE INPUT -->
+<input type="file" id="receiptFile" accept="image/*">
+
+<!-- RECEIPT MODAL -->
+<div class="modal-bg hidden" id="receiptModal">
+  <div class="modal">
+    <div class="modal-title" id="receiptModalTitle">📸 Receipt Scanned</div>
+    <div class="modal-sub" id="receiptModalSub">Assigning line items to jobs…</div>
+    <div class="modal-load hidden" id="receiptLoad"><div class="spin"></div><span>Reading receipt with AI vision…</span></div>
+    <div id="riList" class="ri-list"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeReceiptModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="receiptConfirmBtn" onclick="confirmReceipt()">Log material costs</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo">⚡ ProBid HQ <span class="logo-tag">beta</span></div>
+  <button class="ni act" id="ni-estimate" onclick="go('estimate')">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 1h10a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V2a1 1 0 011-1zm1 2v2h8V3H4zm0 4v1h8V7H4zm0 3v1h5v-1H4z"/></svg>
+    Estimate
+  </button>
+  <button class="ni" id="ni-jobs" onclick="go('jobs')">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v10H2zm1 2v7h10V5zm2 1h6v1H5zm0 2h6v1H5zm0 2h4v1H5z"/></svg>
+    Jobs
+  </button>
+  <button class="ni" id="ni-data" onclick="go('data')">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 2C4.7 2 2 3.3 2 5v6c0 1.7 2.7 3 6 3s6-1.3 6-3V5c0-1.7-2.7-3-6-3zm0 1.5c2.8 0 4.5.9 4.5 1.5S10.8 6.5 8 6.5 3.5 5.6 3.5 5s1.7-1.5 4.5-1.5z"/></svg>
+    Data Moat
+  </button>
+  <button class="ni" id="ni-calibration" onclick="go('calibration')">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm.5 3v4.3l3.3 2-.8 1.2-3.7-2.2V4z"/></svg>
+    Calibration
+  </button>
+  <button class="ni drip-badge" id="ni-followup" onclick="go('followup')" style="color:var(--or)"><span class="drip-dot hidden" id="dripDot"></span>
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM7 4h2v5H7zm0 6h2v2H7z"/></svg>
+    Follow-Up
+  </button>
+  <button class="ni" id="ni-settings" onclick="go('settings')">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M7 1h2l.5 1.5A5 5 0 0111 3.4l1.5-.5 1.4 1.4-.5 1.5A5 5 0 0114 8a5 5 0 01-.5 1.7l.5 1.5-1.4 1.4L11 12.1A5 5 0 019.5 13L9 14.5H7L6.5 13A5 5 0 015 12.1l-1.5.5-1.4-1.4.5-1.5A5 5 0 012 8a5 5 0 01.5-1.7l-.5-1.5 1.4-1.4 1.5.5A5 5 0 016.5 2.5zm1 4a3 3 0 100 6 3 3 0 000-6z"/></svg>
+    Settings
+  </button>
+  <div class="nav-gap"></div>
+  <div class="conn"><div class="cdot on" id="cdot"></div><span id="cLbl">connected</span></div>
+</nav>
+
+<!-- ─── ESTIMATE ─── -->
+<div class="scr act" id="scr-estimate">
+
+  <!-- Setup handled server-side -->
+  <!-- MAIN ESTIMATE UI -->
+  <div id="estDiv" style="display:none">
+    <div class="track-bar hidden" id="trackBar">
+      <div class="tdot"></div>
+      <span>GPS tracking: <strong id="trackJobName"></strong></span>
+      <span class="ttimer" id="trackTimer">00:00:00</span>
+      <button class="btn btn-ghost btn-sm" onclick="stopTracking()" style="margin-left:.5rem;padding:.28rem .6rem;font-size:.68rem">Stop</button>
+    </div>
+    <div class="due-bar hidden" id="dueBar">
+      <span style="font-size:1.1rem">📋</span>
+      <div><strong><span class="due-count" id="dueCount">0</span> estimate(s) need follow-up today</strong><div style="font-size:.65rem;color:var(--tx2);margin-top:.08rem">Tap to open → send in one tap</div></div>
+      <button class="btn btn-or btn-sm" style="margin-left:auto" onclick="go('followup')">View pipeline →</button>
+    </div>
+    <div class="est-grid">
+      <!-- LEFT: FORM PANEL -->
+      <div class="panel">
+        <div class="panel-hd">Job Details</div>
+        <div class="cust-section">
+          <div style="font-size:.65rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--bl);margin-bottom:.48rem;font-weight:500">Customer (optional — enables follow-up)</div>
+          <div class="frow"><label class="lbl">Name</label><input class="inp" id="custName" placeholder="John Smith"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.62rem">
+            <div><label class="lbl">Phone</label><input class="inp" id="custPhone" placeholder="(714) 555-1234" maxlength="14" oninput="fmtPhone(this)"></div>
+            <div><label class="lbl">Email</label><input class="inp" id="custEmail" placeholder="john@email.com"></div>
+          </div>
+          <div class="frow" style="position:relative"><label class="lbl">Address</label><input class="inp" id="custAddr" placeholder="123 Main St" autocomplete="off" oninput="addrInput(this)" onkeydown="addrKeyDown(event)">
+          <div id="addrDropdown" style="display:none;position:absolute;z-index:300;background:var(--bg3);border:1px solid var(--bd2);border-radius:var(--r8);width:100%;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4);margin-top:2px"></div></div>
+        </div>
+        <div class="frow">
+          <label class="lbl">Job description</label>
+          <textarea class="inp" id="scope" rows="4" placeholder="Describe the job in plain language: install 200A panel upgrade, run 4 new kitchen circuits, EV charger in garage…"></textarea>
+        </div>
+        <div class="frow2">
+          <div>
+            <label class="lbl">Job type</label>
+            <select class="inp" id="jobType">
+              <option value="residential service">Residential service</option>
+              <option value="residential new construction">New construction</option>
+              <option value="commercial">Commercial</option>
+              <option value="light industrial">Light industrial</option>
+              <option value="solar/EV">Solar / EV</option>
+              <option value="service call/repair">Service call</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl">State</label>
+            <select class="inp" id="stateSelect" onchange="onStateChange()">
+              <option value="CA">California</option><option value="TX">Texas</option>
+              <option value="FL">Florida</option><option value="NY">New York</option>
+              <option value="AZ">Arizona</option><option value="CO">Colorado</option>
+              <option value="WA">Washington</option><option value="OR">Oregon</option>
+              <option value="IL">Illinois</option><option value="NV">Nevada</option>
+              <option value="GA">Georgia</option><option value="NC">N. Carolina</option>
+              <option value="PA">Pennsylvania</option><option value="OH">Ohio</option>
+              <option value="MA">Massachusetts</option><option value="MI">Michigan</option>
+              <option value="VA">Virginia</option><option value="MN">Minnesota</option>
+              <option value="NJ">New Jersey</option><option value="TN">Tennessee</option>
+              <option value="MO">Missouri</option><option value="WI">Wisconsin</option>
+            </select>
+          </div>
+        </div>
+        <div class="frow">
+          <label class="lbl" for="countyInput">
+            County
+            <span id="obIndicator" style="font-size:.62rem;margin-left:.35rem"></span>
+          </label>
+          <input class="inp" id="countyInput" list="countyList" placeholder="e.g. Orange County">
+          <datalist id="countyList"></datalist>
+        </div>
+        <div class="frow2">
+          <div>
+            <label class="lbl">Conditions</label>
+            <select class="inp" id="conditions" onchange="updateGenBtnState()">
+              <option value="normal">Normal</option>
+              <option value="difficult">Difficult</option>
+              <option value="very difficult">Very difficult</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl">Labor factor</label>
+            <input class="inp" type="number" id="laborFactor" value="1.00" step="0.05" min="0.5" max="2.5">
+          </div>
+        </div>
+        <div class="frow2">
+          <div>
+            <label class="lbl">Overhead %</label>
+            <input class="inp" type="number" id="overhead" value="15">
+          </div>
+          <div>
+            <label class="lbl">Margin %</label>
+            <input class="inp" type="number" id="margin" value="20">
+          </div>
+        </div>
+        <div class="frow">
+          <label class="lbl">Supplier discount %</label>
+          <input class="inp" type="number" id="supplierDisc" value="0" min="0" max="70" placeholder="Your Rexel/Graybar discount">
+          <div class="hint">Your negotiated discount off list price.</div>
+        </div>
+        <button class="gen-btn" id="genBtn" onclick="generate()">
+          <span id="gIcon">⚡</span> <span id="gTxt">Generate estimate</span>
+        </button>
+      </div>
+
+      <!-- RIGHT: OUTPUT PANEL -->
+      <div class="out-panel" id="outPanel">
+        <div class="out-empty" id="outEmpty">
+          <div class="out-empty-ico">📋</div>
+          <div class="out-empty-t">Your estimate will appear here</div>
+          <div class="out-empty-d">Describe the job and click Generate. Once created, ProBid locks the estimate — the same job always returns the same price.</div>
+        </div>
+        <div class="out-load hidden" id="outLoad">
+          <div class="spin"></div>
+          <div class="load-msg" id="loadMsg"></div>
+        </div>
+        <div id="outResult" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── JOBS ─── -->
+<div class="scr" id="scr-jobs">
+  <div class="s-hd"><div class="s-hd-title">Job Tracker</div><div class="s-hd-desc">All estimates with passive data capture — tap any card to open and log actuals</div></div>
+  <div class="hist-grid" id="histGrid"><div class="no-hist">No estimates yet.</div></div>
+</div>
+
+<!-- ─── FOLLOW-UP ─── -->
+<div class="scr" id="scr-followup">
+  <div class="s-hd"><div class="s-hd-title">Follow-Up Pipeline</div><div class="s-hd-desc">Every estimate has a sale attached to it. Work it until you get a yes or a no.</div></div>
+  <div class="fu-pipeline">
+    <div class="fu-col"><div class="fu-col-hd">🔥 Hot <span class="fu-col-count" id="fu-hot-count">0</span></div><div id="fu-hot-list"><div class="fu-empty">No hot leads</div></div></div>
+    <div class="fu-col"><div class="fu-col-hd">🌤 Warm <span class="fu-col-count" id="fu-warm-count">0</span></div><div id="fu-warm-list"><div class="fu-empty">No warm leads</div></div></div>
+    <div class="fu-col"><div class="fu-col-hd">❄️ Cold / Unscored <span class="fu-col-count" id="fu-cold-count">0</span></div><div id="fu-cold-list"><div class="fu-empty">No cold leads</div></div></div>
+  </div>
+  <p style="font-size:.7rem;color:var(--tx3);text-align:center">Add customer name + phone/email when estimating to activate follow-up tracking.</p>
+</div>
+
+<!-- ─── DATA MOAT ─── -->
+<div class="scr" id="scr-data">
+  <div class="s-hd"><div class="s-hd-title">Your Data Moat</div><div class="s-hd-desc">Proprietary labor unit data built from your real jobs. After 50+ estimates with actuals, this becomes your unfair competitive advantage.</div></div>
+  <div class="moat-hero">
+    <div class="moat-h">🔒 This dataset cannot be licensed, bought, or replicated by any competitor</div>
+    <div class="moat-d">Every completed estimate + GPS hours + receipt costs = a proprietary performance profile calibrated to your crew speed and your market. NECA publishes national averages. This reflects <em>your</em> actual performance.</div>
+  </div>
+  <div class="dm-grid" id="dmGrid">
+    <div class="dm-stat"><div class="dm-val" id="dm-total">0</div><div class="dm-lbl">Total estimates</div><div class="dm-sub">lifetime</div></div>
+    <div class="dm-stat"><div class="dm-val" id="dm-actuals">0</div><div class="dm-lbl">With actuals</div><div class="dm-sub">GPS + receipts captured</div></div>
+    <div class="dm-stat"><div class="dm-val" id="dm-wr">—</div><div class="dm-lbl">Win rate</div><div class="dm-sub">marked won/lost</div></div>
+    <div class="dm-stat"><div class="dm-val" id="dm-lf">—</div><div class="dm-lbl">Avg labor factor</div><div class="dm-sub">est vs actual hrs</div></div>
+    <div class="dm-stat"><div class="dm-val" id="dm-mg">—</div><div class="dm-lbl">Avg real margin</div><div class="dm-sub">completed jobs</div></div>
+    <div class="dm-stat"><div class="dm-val" id="dm-dp">0</div><div class="dm-lbl">Data points</div><div class="dm-sub">GPS + receipt + voice</div></div>
+    <div class="dm-stat"><div class="dm-val" id="dm-fu">—</div><div class="dm-lbl">Follow-up rate</div><div class="dm-sub">% w/ customer contacted</div></div>
+    <div class="dm-stat"><div class="dm-val" id="dm-conv">—</div><div class="dm-lbl">Follow-up wins</div><div class="dm-sub">won after contact</div></div>
+  </div>
+  <div style="font-size:.75rem;font-weight:600;color:var(--tx2);margin-bottom:.6rem;font-family:var(--font-mono)">LABOR FACTOR BY JOB TYPE — your crew vs NECA standard</div>
+  <div class="jt-list" id="jtList"><div style="font-size:.74rem;color:var(--tx3);padding:.5rem">Complete estimates with GPS + receipt data to see per-type analysis.</div></div>
+</div>
+
+<!-- ─── CALIBRATION ─── -->
+<div class="scr" id="scr-calibration">
+  <div class="s-hd"><div class="s-hd-title">Calibration Tool</div><div class="s-hd-desc">Find your personal labor factor — run a test job, compare to your real bid, and ProBid self-corrects for every future estimate</div></div>
+  <div class="cal-list">
+    <div class="cal-card">
+      <div class="cal-n">Step 1 — Run a test job</div>
+      <p style="font-size:.78rem;color:var(--tx2);line-height:1.6">Click a test job to load into the estimator. Generate the estimate, note the total, come back here.</p>
+      <div class="cal-test-wrap">
+        <button class="ctj" onclick="loadTest('panel200')">200A panel upgrade</button>
+        <button class="ctj" onclick="loadTest('kitchen')">Kitchen remodel wiring</button>
+        <button class="ctj" onclick="loadTest('ev')">EV charger install</button>
+        <button class="ctj" onclick="loadTest('service')">Service call troubleshoot</button>
+      </div>
+    </div>
+    <div class="cal-card">
+      <div class="cal-n">Step 2 — Compare</div>
+      <p style="font-size:.78rem;color:var(--tx2);line-height:1.6">Enter ProBid's estimate and what you'd actually bid the same job.</p>
+      <div class="cal-2col">
+        <div><label class="lbl">ProBid estimate ($)</label><input class="inp" type="number" id="calPb" placeholder="2400"></div>
+        <div><label class="lbl">Your actual bid ($)</label><input class="inp" type="number" id="calAct" placeholder="2800"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" style="margin-top:.6rem" onclick="calcFactor()">Calculate factor</button>
+      <div class="cal-result" id="calResult"></div>
+    </div>
+    <div class="cal-card">
+      <div class="cal-n">Step 3 — Auto-calibration</div>
+      <p style="font-size:.78rem;color:var(--tx2);line-height:1.6">After 10 completed jobs with GPS time data, ProBid automatically suggests an updated labor factor based on your real performance. No manual calculation needed.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SETTINGS ─── -->
+<div class="scr" id="scr-settings">
+  <div class="s-hd"><div class="s-hd-title">Settings</div><div class="s-hd-desc">Company info and estimating defaults applied to every bid</div></div>
+  <div class="set-grid">
+    <div class="set-card">
+      <div class="set-hd">Company</div>
+      <div class="frow"><label class="lbl">Company name</label><input class="inp" id="s-co" placeholder="Your Electrical LLC"></div>
+      <div class="frow"><label class="lbl">License number</label><input class="inp" id="s-lic" placeholder="C-10 12345"></div>
+      <div class="frow"><label class="lbl">Phone</label><input class="inp" id="s-ph" placeholder="(714) 555-1234"></div>
+    </div>
+    <div class="set-card">
+      <div class="set-hd">Estimating Defaults</div>
+      <div class="frow"><label class="lbl">Overhead %</label><input class="inp" type="number" id="s-ov" value="15"></div>
+      <div class="frow"><label class="lbl">Margin %</label><input class="inp" type="number" id="s-mg" value="20"></div>
+      <div class="frow"><label class="lbl">Supplier discount %</label><input class="inp" type="number" id="s-sd" value="0"></div>
+      <div class="frow"><label class="lbl">Default labor factor</label><input class="inp" type="number" id="s-lf" value="1.00" step="0.05"></div>
+    </div>
+    <div class="set-card">
+      <div class="set-hd">Connection</div>
+      <div style="background:var(--grb);border:1px solid var(--gr3);border-radius:var(--r8);padding:.7rem .9rem;font-size:.74rem;color:var(--gr);line-height:1.65">
+        ✓ Connected — estimates are processed securely through ProBid HQ. No API key required.
+      </div>
+      <div style="font-size:.7rem;color:var(--tx3);margin-top:.5rem;line-height:1.6">
+        Live material pricing available. Contact <strong>support@probidhq.com</strong> to activate for your account.
+      </div>
+    </div>
+
+    <div class="set-card">
+      <div class="set-hd">Data Capture</div>
+      <div style="font-size:.76rem;color:var(--tx2);line-height:1.7">
+        <p>ProBid captures three types of actual job data:</p>
+        <p style="margin-top:.4rem"><strong style="color:var(--bl)">GPS Timer</strong> — One-tap start/stop timer with location verification. Confirms you're within 500m of the job site before logging hours. Works on iOS and Android.</p>
+        <p style="margin-top:.4rem"><strong style="color:var(--am)">Receipt Scan</strong> — Photo of any receipt. AI reads every line item and lets you split across multiple active jobs in seconds.</p>
+        <p style="margin-top:.4rem"><strong style="color:var(--pu)">Voice Notes</strong> — Speak a job note. AI parses hours, materials, and scope changes automatically.</p>
+        <p style="margin-top:.4rem;color:var(--tx3)">All data stays in your browser. Never sent to any server except AI processing.</p>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-primary" style="margin-top:1rem" onclick="saveSettings()">Save settings</button>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let apiKey = 'proxy'; // handled server-side
+let obKey = ''; // 1build key is server-side
+let settings = (function(){ try{ return JSON.parse(localStorage.getItem('pbhq_cfg')||'{}'); } catch(e){ return {}; } })();
+let history  = (function(){ try{ return JSON.parse(localStorage.getItem('pbhq_hist')||'[]'); } catch(e){ return []; } })();
+
+function safeStore(key, val) {
+  try { localStorage.setItem(key, val); } catch(e) { /* quota — non-critical */ }
+}
+let current  = null;
+let timerRef = null;
+let trackStart = null;
+let trackJobId = null;
+let pendingReceipt = [];
+let receiptTargetJobId = null;
+let recognition = null;
+let isRecording = false;
+
+// ════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════
+function boot() {
+  applySettings();
+  showEstMain(); // always connected
+  updateObIndicator();
+  renderHist();
+  renderDataMoat();
+  renderFollowupPipeline();
+  updateDueBadge();
+  updateGenBtnState();
+  document.getElementById('receiptFile').addEventListener('change', handleReceiptFile);
+  // restore any active tracking
+  const saved = (function(){ try{ return JSON.parse(sessionStorage.getItem('pbhq_track')||'null'); } catch(e){ return null; } })();
+  if (saved && saved.id) {
+    const j = history.find(h => h._id === saved.id);
+    if (j) { trackJobId = saved.id; trackStart = saved.start; startTimerDisplay(); showTrackBar(j.job_title||'job'); }
+  }
+}
+
+function showSetup() { var _sd=document.getElementById('setupDiv'); if(_sd) _sd.style.display='block'; document.getElementById('estDiv').style.display='none'; }
+function showEstMain() {
+  var sd = document.getElementById('setupDiv');
+  if (sd) sd.style.display='none';
+  document.getElementById('estDiv').style.display='block';
+  document.getElementById('cdot').classList.add('on');
+  document.getElementById('cLbl').textContent='connected';
+}
+
+// ════════════════════════════════════════════════════════
+// NAV
+// ════════════════════════════════════════════════════════
+function go(n) {
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('act'));
+  document.querySelectorAll('.ni').forEach(b=>b.classList.remove('act'));
+  document.getElementById('scr-'+n).classList.add('act');
+  const btn = document.getElementById('ni-'+n.split('-')[0]);
+  if (btn) btn.classList.add('act');
+  if (n==='jobs') renderHist();
+  if (n==='data') renderDataMoat();
+  if (n==='settings') loadSettingsUI();
+}
+
+// ════════════════════════════════════════════════════════
+// KEYS & SETTINGS
+// ════════════════════════════════════════════════════════
+function saveKey() {
+  const k = (document.getElementById('keyInput')||{value:''}).value.trim();
+  const ob = (document.getElementById('obInput')||{value:''}).value.trim();
+  if (!k.startsWith('sk-ant-')) { toast('Enter a valid Anthropic API key (starts with sk-ant-)', 'err'); return; }
+  apiKey = k; safeStore('pbhq_key', k);
+  if (ob) { obKey = ob; safeStore('pbhq_1b', ob); }
+  showEstMain(); updateObIndicator(); toast('Connected! Ready to estimate.', 'ok');
+}
+
+function applySettings() {
+  if (settings.overhead !== undefined) document.getElementById('overhead').value = settings.overhead;
+  if (settings.margin !== undefined) document.getElementById('margin').value = settings.margin;
+  if (settings.laborFactor !== undefined) document.getElementById('laborFactor').value = settings.laborFactor;
+  if (settings.supplierDisc !== undefined) document.getElementById('supplierDisc').value = settings.supplierDisc;
+}
+
+function loadSettingsUI() {
+  document.getElementById('s-co').value = settings.company||'';
+  document.getElementById('s-lic').value = settings.license||'';
+  document.getElementById('s-ph').value = settings.phone||'';
+  document.getElementById('s-ov').value = settings.overhead||15;
+  document.getElementById('s-mg').value = settings.margin||20;
+  document.getElementById('s-sd').value = settings.supplierDisc||0;
+  document.getElementById('s-lf').value = settings.laborFactor||1.0;
+  // API keys managed server-side
+  (document.getElementById('s-sms1')||{}).value=settings.sms1||'';
+  (document.getElementById('s-sms3')||{}).value=settings.sms3||'';
+  (document.getElementById('s-esub')||{}).value=settings.emailSubject||'';
+  (document.getElementById('s-em')||{}).value=settings.email||'';
+}
+
+function saveSettings() {
+  settings = {
+    company: document.getElementById('s-co').value,
+    license: document.getElementById('s-lic').value,
+    phone:   document.getElementById('s-ph').value,
+    overhead: parseFloat(document.getElementById('s-ov').value)||15,
+    margin:   parseFloat(document.getElementById('s-mg').value)||20,
+    supplierDisc: parseFloat(document.getElementById('s-sd').value)||0,
+    laborFactor: parseFloat(document.getElementById('s-lf').value)||1.0,
+    sms1: (document.getElementById('s-sms1')||{value:''}).value,
+    sms3: (document.getElementById('s-sms3')||{value:''}).value,
+    emailSubject: (document.getElementById('s-esub')||{value:''}).value,
+    email: (document.getElementById('s-em')||{value:''}).value
+  };
+  safeStore('pbhq_cfg', JSON.stringify(settings));
+  const ak = (document.getElementById('s-ak')||{value:''}).value.trim();
+  if (ak.startsWith('sk-ant-')) { apiKey = ak; safeStore('pbhq_key', ak); }
+  const ob = (document.getElementById('s-1b')||{value:''}).value.trim();
+  if (ob) { obKey = ob; safeStore('pbhq_1b', ob); }
+  applySettings(); updateObIndicator(); toast('Settings saved', 'ok');
+}
+
+function updateObIndicator() {
+  const el = document.getElementById('obIndicator');
+  if (!el) return;
+  if (obKey) { el.textContent='● 1build live'; el.style.color='var(--gr)'; }
+  else        { el.textContent='○ static prices'; el.style.color='var(--tx3)'; }
+}
+
+// ════════════════════════════════════════════════════════
+// COUNTIES
+// ════════════════════════════════════════════════════════
+const COUNTIES = {
+  CA:['Los Angeles County','Orange County','San Diego County','Santa Clara County','San Francisco County','Alameda County','Riverside County','San Bernardino County','Sacramento County','Contra Costa County','Kern County','Ventura County','San Mateo County'],
+  TX:['Harris County','Dallas County','Tarrant County','Bexar County','Travis County','Collin County','Fort Bend County','El Paso County'],
+  FL:['Miami-Dade County','Broward County','Palm Beach County','Hillsborough County','Orange County','Pinellas County'],
+  NY:['New York County','Kings County','Queens County','Nassau County','Suffolk County','Westchester County'],
+  AZ:['Maricopa County','Pima County','Pinal County'],
+  CO:['Denver County','El Paso County','Jefferson County','Arapahoe County','Boulder County'],
+  WA:['King County','Pierce County','Snohomish County','Spokane County'],
+  OR:['Multnomah County','Washington County','Lane County'],
+  IL:['Cook County','DuPage County','Lake County','Will County'],
+  NV:['Clark County','Washoe County'],
+  GA:['Fulton County','Gwinnett County','Cobb County'],
+  NC:['Mecklenburg County','Wake County','Guilford County'],
+  PA:['Philadelphia County','Allegheny County','Montgomery County'],
+  OH:['Franklin County','Cuyahoga County','Hamilton County'],
+  MA:['Suffolk County','Middlesex County','Worcester County'],
+  MI:['Wayne County','Oakland County','Macomb County'],
+  VA:['Fairfax County','Prince William County','Virginia Beach'],
+  MN:['Hennepin County','Ramsey County','Dakota County'],
+  NJ:['Bergen County','Essex County','Middlesex County'],
+  TN:['Shelby County','Davidson County','Knox County'],
+  MO:['St. Louis County','Jackson County'],
+  WI:['Milwaukee County','Dane County']
+};
+
+function onStateChange() {
+  const st = document.getElementById('stateSelect').value;
+  const dl = document.getElementById('countyList');
+  dl.innerHTML = (COUNTIES[st]||[]).map(c=>`<option value="${c}">`).join('');
+  document.getElementById('countyInput').value = (COUNTIES[st]||[''])[0];
+}
+
+// ════════════════════════════════════════════════════════
+// LABOR RATES
+// ════════════════════════════════════════════════════════
+const RATES = {AK:95,AL:52,AR:50,AZ:72,CA:110,CO:82,CT:105,DC:115,DE:95,FL:65,GA:62,HI:110,IA:68,ID:60,IL:95,IN:70,KS:65,KY:62,LA:58,MA:110,MD:98,ME:82,MI:78,MN:88,MO:70,MS:48,MT:65,NC:65,ND:72,NE:68,NH:95,NJ:108,NM:62,NV:82,NY:118,OH:72,OK:58,OR:88,PA:92,RI:102,SC:60,SD:62,TN:62,TX:70,UT:72,VA:82,VT:88,WA:98,WI:78,WV:58,WY:65};
+const getRate = st => RATES[st] || 75;
+
+// ════════════════════════════════════════════════════════
+// ERI-CALIBRATED LABOR UNITS [normal, difficult, very_difficult] hours
+// ════════════════════════════════════════════════════════
+const ERI = {
+  '200A main panel upgrade':[4.0,5.5,7.5],'100A sub-panel':[2.5,3.5,5.0],
+  '20A branch circuit (open framing)':[1.25,1.75,2.5],'20A branch circuit (finished walls)':[2.5,3.5,5.0],
+  'GFCI outlet':[0.5,0.75,1.1],'standard duplex outlet':[0.4,0.6,0.9],
+  'single-pole switch':[0.35,0.5,0.8],'3-way switch':[0.6,0.85,1.25],
+  'dimmer switch':[0.45,0.65,1.0],'ceiling fan (supply+install)':[1.5,2.0,2.75],
+  '6-inch recessed LED':[0.65,0.95,1.4],'bathroom exhaust fan':[1.25,1.75,2.5],
+  '240V dryer circuit (10/3, 30A)':[2.0,2.75,4.0],'240V range circuit (6/3, 50A)':[2.25,3.0,4.25],
+  'EV charger circuit (50A, NEMA 14-50)':[2.5,3.5,5.0],'AFCI breaker':[0.35,0.5,0.75],
+  'GFCI breaker':[0.35,0.5,0.75],'standard single-pole breaker':[0.2,0.3,0.45],
+  'double-pole breaker':[0.25,0.35,0.55],'EMT conduit per 10ft (standard)':[0.4,0.6,0.9],
+  'EMT conduit per 10ft (hard conditions)':[0.65,0.9,1.4],'MC cable per 10ft (open framing)':[0.2,0.3,0.45],
+  'MC cable per 10ft (finished walls)':[0.45,0.65,1.0],'HVAC disconnect (240V, 60A)':[1.0,1.4,2.0],
+  'wire HVAC condenser + air handler':[3.0,4.0,5.5],'service entrance weatherhead':[1.0,1.4,2.0],
+  'grounding electrode system':[1.5,2.0,2.75],'whole home generator transfer switch':[6.0,8.0,11.0],
+  'portable generator inlet (interlock)':[3.0,4.0,5.5],'troubleshoot dead circuit':[1.5,2.0,3.0],
+  'panel inspection and labeling':[1.25,1.75,2.5],'solar circuit (per string)':[2.0,2.75,4.0]
+};
+
+const condIdx = c => c==='difficult'?1:c==='very difficult'?2:0;
+
+// ════════════════════════════════════════════════════════
+// 1BUILD API CALL  — called during generate() if obKey set
+// Returns array of { searchTerm, name, matCents, laborCents } or []
+// ════════════════════════════════════════════════════════
+async function fetch1buildBatch(keywords, state, county) {
+  if (!keywords.length) return [];
+  const results = [];
+  // We batch up to 5 keywords to avoid long load times
+  const batch = keywords.slice(0, 5);
+  for (const kw of batch) {
+    try {
+      const q = `query Q($i:SourceSearchInput!){sources(input:$i){nodes{name calculatedUnitRateUsdCents laborRateUsdCents materialRateUsdCents}}}`;
+      const v = { i: { state, county, searchTerm: kw, page: { limit: 1 } } };
+      // Route through Netlify proxy to avoid CORS
+      const res = await fetch('/.netlify/functions/onebuild', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ query: q, variables: v })
+      });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const nodes = data?.data?.sources?.nodes;
+      if (nodes && nodes.length) {
+        results.push({ kw, name: nodes[0].name, matCents: nodes[0].materialRateUsdCents, laborCents: nodes[0].laborRateUsdCents, totalCents: nodes[0].calculatedUnitRateUsdCents });
+      }
+    } catch(e) { /* skip */ }
+  }
+  return results;
+}
+
+// ════════════════════════════════════════════════════════
+// SYSTEM PROMPT
+// ════════════════════════════════════════════════════════
+function buildPrompt(rate, overhead, margin, cond, factor, disc, liveData) {
+  const ci = condIdx(cond);
+  const laborTbl = Object.entries(ERI)
+    .map(([t,h]) => `  ${t}: ${(h[ci]*factor).toFixed(2)} hrs`)
+    .join('\n');
+
+  let priceNote = `Material pricing: Use industry-standard 2025-2026 contractor prices. Apply ${disc}% supplier discount to all materials.`;
+  if (liveData.length) {
+    const liveLines = liveData.map(d => `  "${d.kw}" → ${d.name}: $${(d.matCents/100).toFixed(2)} material/unit (1build ${cond})`).join('\n');
+    priceNote = `Material pricing (LIVE 1build county data for ${cond} conditions):\n${liveLines}\n  Use these exact prices for the items above. Apply ${disc}% supplier discount to all materials. For unlisted items use current market prices.`;
+  }
+
+  return `You are a master electrical estimator with 20+ years of field experience. Produce complete, accurate estimates that win bids.
+
+## ERI-CALIBRATED LABOR UNITS (${cond} conditions, ${factor.toFixed(2)}x labor factor)
+${laborTbl}
+For unlisted tasks: use professional judgment, mark confidence lower.
+
+## FINANCIALS
+Journeyman labor rate: $${rate}/hr
+Overhead: ${overhead}%  |  Profit margin: ${margin}%
+
+## ${priceNote}
+
+## OUTPUT — return ONLY valid JSON, no markdown:
+{
+  "job_title": "Brief job title",
+  "summary": "2-sentence professional summary for the bid cover",
+  "line_items": [{"description":"","hours":0.0,"labor_cost":0.00,"material_cost":0.00,"total":0.00,"confidence":"high|medium|low","note":""}],
+  "labor_subtotal":0.00,"material_subtotal":0.00,"overhead_amount":0.00,"profit_amount":0.00,"total_bid":0.00,"total_hours":0.0,
+  "material_list":[{"item":"200A Square D QO panel","qty":1,"unit":"ea","est_cost":350}],"scope_notes":"what's included and excluded","permit_note":"permit requirements",
+  "material_keywords":["12 AWG NM-B wire","200A Square D panel","EMT conduit"]
+}
+
+material_keywords: list 3-5 key materials for live price lookup.
+material_list: Complete shopping list. Include EVERY item including connectors, fittings, boxes, wire nuts, staples, covers. Add 12% waste to wire/conduit quantities. Include est_cost (contractor price, no markup).
+confidence: "high" = from ERI table | "medium" = interpolated | "low" = assumption required
+Be accurate. Comprehensive. Include ALL tasks a professional would charge for.
+
+## CONSISTENCY RULES — CRITICAL
+Produce the SAME estimate structure every run for the same job. Do NOT vary line item count or order between runs.
+For any 200A panel upgrade always include: panel, weatherhead, service entrance cable, grounding electrode, breakers, permit/utility coordination.
+Round all labor hours to nearest 0.25. Round all dollar amounts to nearest dollar.
+Do not randomly add or remove line items between identical runs. Be deterministic.`;
+}
+
+// ════════════════════════════════════════════════════════
+// GENERATE
+// ════════════════════════════════════════════════════════
+let loadStart = 0;
+async function generate() {
+  // apiKey handled server-side
+  const scope = document.getElementById('scope').value.trim();
+  if (!scope) { toast('Describe the job first', 'err'); return; }
+
+  const state    = document.getElementById('stateSelect').value;
+  const county   = document.getElementById('countyInput').value || (COUNTIES[state]||[''])[0];
+  const jobType  = document.getElementById('jobType').value;
+  const cond     = document.getElementById('conditions').value;
+  const factor   = parseFloat(document.getElementById('laborFactor').value) || 1.0;
+  const overhead = parseFloat(document.getElementById('overhead').value) || 15;
+  const margin   = parseFloat(document.getElementById('margin').value) || 20;
+  const disc     = parseFloat(document.getElementById('supplierDisc').value) || 0;
+  const rate     = getRate(state);
+
+
+  // ── Cache check: same inputs → same result, always ──
+  var _cKey = buildCacheKey(scope, state, county, jobType, cond, factor, overhead, margin, disc);
+  var _cached = getCachedEstimate(_cKey);
+  if (_cached) {
+    current = _cached;
+    renderEst(_cached);
+    toast('🔒 Same inputs — locked estimate returned. Price is consistent.', 'ok');
+    setLoad(false);
+    updateGenBtnState();
+    return;
+  }
+
+  setLoad(true);
+  loadStart = Date.now();
+  const steps = [
+    obKey ? '⚡ Fetching live 1build county pricing…' : '📋 Loading material pricing…',
+    '🔧 Applying ERI labor units…',
+    `📍 Calculating ${county||state} rates…`,
+    '💼 Applying overhead + margin…',
+    '✅ Finalizing professional bid…'
+  ];
+  let si = 0;
+  const iv = setInterval(() => { si=(si+1)%steps.length; const el=document.getElementById('loadMsg'); if(el) el.textContent=steps[si]; }, 1700);
+
+  // Step 1: Get a first estimate to discover material keywords, then optionally re-enrich
+  const sysPrompt0 = buildPrompt(rate, overhead, margin, cond, factor, disc, []);
+  const userMsg = `Estimate this ${jobType} job:\n<scope>${scope}</scope>\n<state>${state}</state>\n<county>${county}</county>\n<instruction>This is a deterministic request. Produce exactly the same line items, hours, and costs as you would for any identical request. Do not vary structure between runs.</instruction>`;
+
+  try {
+    const r1 = await callAnthropic(sysPrompt0, userMsg);
+    clearInterval(iv);
+
+    // Step 2: If 1build key, fetch live prices for the material_keywords
+    let liveData = [];
+    if (obKey && r1.material_keywords && r1.material_keywords.length) {
+      document.getElementById('loadMsg').textContent = '⚡ Enriching with live 1build prices…';
+      liveData = await fetch1buildBatch(r1.material_keywords, state, county);
+    }
+
+    // Step 3: If we got live data, do a quick re-pass to apply correct prices
+    let est = r1;
+    if (liveData.length) {
+      document.getElementById('loadMsg').textContent = '🔄 Applying live county prices…';
+      const sysPrompt2 = buildPrompt(rate, overhead, margin, cond, factor, disc, liveData);
+      const r2 = await callAnthropic(sysPrompt2, userMsg);
+      est = r2;
+    }
+
+    finishEstimate(est, { state, county, jobType, cond, factor, overhead, margin, disc, rate, liveData });
+  } catch(err) {
+    clearInterval(iv);
+    setLoad(false);
+    toast(err.message, 'err');
+  }
+}
+
+async function callAnthropic(system, userMsg) {
+  const res = await fetch('/.netlify/functions/claude', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ system, userMsg })
+  });
+  if (!res.ok) { let m='AI error '+res.status; try{const e=await res.json();m=e.error||m;}catch(x){} throw new Error(m); }
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  let raw = (data.text||'').trim().replace(/^```json\s*/i,'').replace(/\s*```$/i,'').trim();
+  try { return JSON.parse(raw); } catch(e) { throw new Error('AI returned invalid response. Try again.'); }
+}
+
+function finishEstimate(est, meta) {
+  est._id       = Date.now();
+  est._scope    = document.getElementById('scope').value;
+  est._state    = meta.state;
+  est._county   = meta.county;
+  est._jobType  = meta.jobType;
+  est._cond     = meta.cond;
+  est._factor   = meta.factor;
+  est._overhead = meta.overhead;
+  est._margin   = meta.margin;
+  est._disc     = meta.disc;
+  est._rate     = meta.rate;
+  est._live     = meta.liveData.length > 0;
+  est._liveCount= meta.liveData.length;
+  est._date     = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  est._status   = 'pending';
+  est._logs     = [];
+  est._dateRaw  = Date.now();
+  est._dripState = {};
+  est._fuLog    = [];
+  est._lead     = '';
+  var cf = getCustFromForm();
+  est._custName=cf._custName; est._custPhone=cf._custPhone; est._custEmail=cf._custEmail; est._custAddr=cf._custAddr;
+  // Store in estimate cache so re-runs of identical inputs return this exact result
+  var _eKey = buildCacheKey(est._scope, est._state, est._county, est._jobType, est._cond,
+                             est._factor, est._overhead, est._margin, est._disc);
+  setCachedEstimate(_eKey, est);
+  current = est;
+  addHist(est);
+  renderEst(est);
+  setLoad(false);
+  toast('Estimate ready!', 'ok');
+  updateGenBtnState();
+}
+
+// ════════════════════════════════════════════════════════
+// RENDER ESTIMATE
+// ════════════════════════════════════════════════════════
+function renderEst(e) {
+  document.getElementById('outEmpty').style.display='none';
+  document.getElementById('outLoad').classList.add('hidden');
+  document.getElementById('outResult').style.display='block';
+
+  var cfMap = {high:'conf-h',medium:'conf-m',low:'conf-l'};
+  var cfLbl = {high:'&#9679;',medium:'~',low:'!'};
+
+  // Build line item rows — no nested backticks
+  var rows = (e.line_items||[]).map(function(li){
+    var noteHtml = li.note ? '<div class="lt-note">'+li.note+'</div>' : '';
+    var confCls  = cfMap[li.confidence] || 'conf-m';
+    var confMark = cfLbl[li.confidence] || '~';
+    return '<tr>'
+      +'<td>'+li.description+noteHtml+'</td>'
+      +'<td class="lt-num">'+(li.hours||0).toFixed(1)+'</td>'
+      +'<td class="lt-num">$'+Math.round(li.labor_cost||0).toLocaleString()+'</td>'
+      +'<td class="lt-num">$'+Math.round(li.material_cost||0).toLocaleString()+'</td>'
+      +'<td class="lt-bold">$'+Math.round(li.total||0).toLocaleString()+'</td>'
+      +'<td class="'+confCls+'">'+confMark+'</td>'
+      +'</tr>';
+  }).join('');
+
+  var act = computeActuals(e);
+  var isTracking = trackJobId === e._id;
+
+  // Build the full output using string concatenation — zero nested backticks
+  var liveTag   = e._live
+    ? '<span class="tag tag-live">&#9889; 1build live ('+e._liveCount+' items)</span>'
+    : '<span class="tag tag-std">&#128203; standard pricing</span>';
+  var discTag   = e._disc>0 ? '<span class="tag tag-disc">&#127991; '+e._disc+'% supplier disc.</span>' : '';
+  var summaryHtml = e.summary
+    ? '<p style="font-size:.77rem;color:var(--tx2);margin-bottom:.9rem;line-height:1.65">'+e.summary+'</p>'
+    : '';
+  var scopeHtml = e.scope_notes
+    ? '<div style="background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r8);padding:.65rem .85rem;font-size:.75rem;margin-bottom:.75rem;line-height:1.6"><strong>Scope:</strong> '+e.scope_notes+'</div>'
+    : '';
+  var permitHtml = e.permit_note
+    ? '<div style="background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r8);padding:.65rem .85rem;font-size:.75rem;margin-bottom:.75rem;line-height:1.6"><strong>Permits:</strong> '+e.permit_note+'</div>'
+    : '';
+  var wonCls  = e._status==='won'  ? ' won'  : '';
+  var lostCls = e._status==='lost' ? ' lost' : '';
+
+  var html = renderLockBar(e)
+    +'<div class="out-head">'
+      +'<div>'
+        +'<div class="out-title">'+(e.job_title||'Electrical Estimate')+'</div>'
+        +'<div class="out-meta">'+(e._county||e._state||'')+'  &middot;  '+e._date+'  &middot;  $'+e._rate+'/hr  &middot;  '+e._jobType+'</div>'
+        +'<div class="out-tags">'+liveTag+discTag+'</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:.4rem;flex-wrap:wrap">'
+        +'<button class="btn btn-ghost btn-sm" onclick="copyEst()">Copy</button>'
+        +'<button class="btn btn-ghost btn-sm" onclick="forceRegenerate()" title="Force fresh estimate">&#8635; Refresh</button>'
+        +'<button class="btn btn-ghost btn-sm" onclick="printBid()">Print</button>'
+        +'<button class="btn btn-ghost btn-sm" onclick="saveTmpl()">Template</button>'
+      +'</div>'
+    +'</div>'
+
+    +'<div class="price-card">'
+      +'<div class="pc-left">'
+        +'<div class="pc-label">Total bid</div>'
+        +'<div class="pc-value">$'+Math.round(e.total_bid||0).toLocaleString()+'</div>'
+        +'<div class="pc-hrs">'+(e.total_hours||0).toFixed(1)+' hours estimated</div>'
+      +'</div>'
+      +'<div class="pc-right">'
+        +'<span>Labor $'+Math.round(e.labor_subtotal||0).toLocaleString()+'</span>'
+        +'<span>Materials $'+Math.round(e.material_subtotal||0).toLocaleString()+'</span>'
+        +'<span>OH+Profit $'+Math.round((e.overhead_amount||0)+(e.profit_amount||0)).toLocaleString()+'</span>'
+      +'</div>'
+    +'</div>'
+
+    +summaryHtml
+
+    +'<table class="lt">'
+      +'<thead><tr>'
+        +'<th>Description</th>'
+        +'<th style="text-align:right">Hrs</th>'
+        +'<th style="text-align:right">Labor</th>'
+        +'<th style="text-align:right">Mats</th>'
+        +'<th style="text-align:right">Total</th>'
+        +'<th>Conf</th>'
+      +'</tr></thead>'
+      +'<tbody>'+rows+'</tbody>'
+    +'</table>'
+    +'<div style="font-size:.62rem;color:var(--tx3);margin-bottom:.9rem;font-family:var(--font-mono)">&#9679; ERI/NECA table &nbsp; ~ review recommended &nbsp; ! verify before sending</div>'
+
+    +'<div class="tot-grid">'
+      +'<div class="tot-item"><div class="tot-lbl">Labor</div><div class="tot-val">$'+Math.round(e.labor_subtotal||0).toLocaleString()+'</div></div>'
+      +'<div class="tot-item"><div class="tot-lbl">Materials</div><div class="tot-val">$'+Math.round(e.material_subtotal||0).toLocaleString()+'</div></div>'
+      +'<div class="tot-item"><div class="tot-lbl">Overhead</div><div class="tot-val">$'+Math.round(e.overhead_amount||0).toLocaleString()+'</div></div>'
+      +'<div class="tot-item"><div class="tot-lbl">Profit</div><div class="tot-val">$'+Math.round(e.profit_amount||0).toLocaleString()+'</div></div>'
+    +'</div>'
+
+    +scopeHtml
+    +permitHtml
+    +renderMaterialList(e)
+    +renderFollowupBlock(e)
+
+    +'<div class="wl-row">'
+      +'<button class="wl-btn'+wonCls+'" onclick="markStatus(\'won\','+e._id+')">&#127881; Won</button>'
+      +'<button class="wl-btn'+lostCls+'" onclick="markStatus(\'lost\','+e._id+')">&#10007; Lost</button>'
+    +'</div>'
+
+    +renderJC(e, act, isTracking);
+
+  document.getElementById('outResult').innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════
+// JOB COSTING PANEL
+// ════════════════════════════════════════════════════════
+function computeActuals(e) {
+  if (!e._logs || !e._logs.length) return null;
+  let hrs=0, mat=0;
+  for (const l of e._logs) {
+    if (l.type==='gps') hrs += l.hours||0;
+    if (l.type==='mat') mat += l.amount||0;
+  }
+  const actLaborCost = hrs * (e._rate||75);
+  const actTotal = actLaborCost + mat;
+  const margin = e.total_bid>0 ? ((e.total_bid-actTotal)/e.total_bid*100).toFixed(1) : null;
+  return { hrs, mat, actLaborCost, actTotal, margin };
+}
+
+function renderJC(e, act, isTracking) {
+  var logHtml = (e._logs||[]).slice(-6).reverse().map(function(l) {
+    if (l.type==='gps')   return '<div class="log-entry"><span class="log-tag lt-gps">GPS</span><span class="log-text">'+l.hours.toFixed(2)+'h at '+(l.location||'job site')+'</span><span class="log-date">'+l.date+'</span></div>';
+    if (l.type==='mat')   return '<div class="log-entry"><span class="log-tag lt-mat">RECEIPT</span><span class="log-text">$'+l.amount.toFixed(2)+' &mdash; '+(l.vendor||'supply house')+(l.items?' ('+l.items+' items)':'')+'</span><span class="log-date">'+l.date+'</span></div>';
+    if (l.type==='voice') return '<div class="log-entry"><span class="log-tag lt-voice">VOICE</span><span class="log-text">'+((l.text||'').substring(0,65))+'&hellip;</span><span class="log-date">'+l.date+'</span></div>';
+    return '';
+  }).join('');
+
+  var statsHtml = act
+    ? '<div class="jc-stats">'
+        +'<div class="jcs"><div class="jcs-lbl">Est hrs</div><div class="jcs-val neu">'+(e.total_hours||0).toFixed(1)+'h</div></div>'
+        +'<div class="jcs"><div class="jcs-lbl">Actual hrs</div><div class="jcs-val '+(act.hrs>(e.total_hours||0)?'neg':'pos')+'">'+act.hrs.toFixed(1)+'h</div></div>'
+        +'<div class="jcs"><div class="jcs-lbl">Real margin</div><div class="jcs-val '+(act.margin!==null&&parseFloat(act.margin)>0?'pos':'neg')+'">'+(act.margin!==null?act.margin+'%':'&mdash;')+'</div></div>'
+        +'<div class="jcs"><div class="jcs-lbl">Est mats</div><div class="jcs-val neu">$'+Math.round(e.material_subtotal||0).toLocaleString()+'</div></div>'
+        +'<div class="jcs"><div class="jcs-lbl">Actual mats</div><div class="jcs-val '+(act.mat>(e.material_subtotal||0)?'neg':'pos')+'">$'+Math.round(act.mat).toLocaleString()+'</div></div>'
+        +'<div class="jcs"><div class="jcs-lbl">Data pts</div><div class="jcs-val neu">'+((e._logs||[]).length)+'</div></div>'
+      +'</div>'
+    : '<p style="font-size:.74rem;color:var(--tx3);margin-bottom:.75rem;line-height:1.6">No actuals yet. Use the buttons below &mdash; GPS timer tracks labor, receipt scan captures materials, voice logs anything else.</p>';
+
+  var gpsCls  = 'jca-btn jca-gps' + (isTracking ? ' active' : '');
+  var micCls  = 'jca-btn jca-mic' + (isRecording ? ' recording' : '');
+  var gpsTxt  = isTracking ? 'Stop GPS timer' : 'Start GPS timer';
+  var micTxt  = isRecording ? 'Stop recording' : 'Voice note';
+  var logDiv  = logHtml ? '<div class="log-list">'+logHtml+'</div>' : '';
+
+  return '<div class="jc-block">'
+    +'<div class="jc-hd">'
+      +'<span class="jc-title">Job Costing &mdash; Actual vs Estimated</span>'
+      +'<span class="jc-badge">Passive Capture</span>'
+    +'</div>'
+    +statsHtml
+    +'<div class="jc-actions">'
+      +'<button class="'+gpsCls+'" onclick="toggleGPS('+e._id+')" id="gpsBtn_'+e._id+'">'
+        +'<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>'
+        +gpsTxt
+      +'</button>'
+      +'<button class="jca-btn jca-cam" onclick="scanReceipt('+e._id+')">'
+        +'<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 2L4 4H2a1 1 0 00-1 1v8a1 1 0 001 1h12a1 1 0 001-1V5a1 1 0 00-1-1h-2L10.5 2h-5zM8 12a3 3 0 110-6 3 3 0 010 6z"/></svg>'
+        +'Scan receipt'
+      +'</button>'
+      +'<button class="'+micCls+'" onclick="toggleVoice('+e._id+')" id="micBtn_'+e._id+'">'
+        +'<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 00-3 3v4a3 3 0 006 0V4a3 3 0 00-3-3zM3 8a5 5 0 0010 0h-1a4 4 0 01-8 0H3zm5 6v-2H7v2H5v1h6v-1H9z"/></svg>'
+        +micTxt
+      +'</button>'
+    +'</div>'
+    +logDiv
+    +'</div>';
+}
+
+// ════════════════════════════════════════════════════════
+// GPS TIMER — correct implementation for iOS + Android
+// One-tap start, location verified, foreground timer
+// NOT silent background tracking (unreliable on iOS PWA)
+// ════════════════════════════════════════════════════════
+function toggleGPS(jobId) {
+  if (trackJobId === jobId) { stopTracking(); return; }
+  if (trackJobId) stopTracking();
+  startTracking(jobId);
+}
+
+function startTracking(jobId) {
+  const job = history.find(h=>h._id===jobId);
+  if (!job) return;
+
+  if (!navigator.geolocation) { toast('GPS not supported on this device', 'err'); return; }
+
+  // Verify location once — no background polling, no battery drain
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      // Optional: could compute distance to job address here if we geocoded it
+      // For MVP: just confirm GPS permission works and record start
+      trackJobId = jobId;
+      trackStart = Date.now();
+      sessionStorage.setItem('pbhq_track', JSON.stringify({id:jobId,start:trackStart}));
+      startTimerDisplay();
+      showTrackBar(job.job_title||'job');
+      if (current && current._id===jobId) renderEst(current);
+      toast(`GPS timer started for "${job.job_title||'job'}"`, 'info');
+    },
+    err => {
+      const msgs = {1:'Location access denied — allow in browser settings',2:'Location unavailable',3:'GPS timed out'};
+      toast(msgs[err.code]||'GPS error', 'err');
+    },
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
+  );
+}
+
+function stopTracking() {
+  if (!trackJobId || !trackStart) return;
+  const hours = (Date.now() - trackStart) / 3600000;
+  const jobId = trackJobId;
+  clearInterval(timerRef); timerRef = null;
+  trackJobId = null; trackStart = null;
+  sessionStorage.removeItem('pbhq_track');
+  document.getElementById('trackBar').classList.add('hidden');
+
+  if (hours < 0.04) { toast('Timer stopped (< 2.5 min — not logged)', ''); if(current)renderEst(current); return; }
+
+  const idx = history.findIndex(h=>h._id===jobId);
+  if (idx<0) return;
+  if (!history[idx]._logs) history[idx]._logs=[];
+  history[idx]._logs.push({type:'gps',hours:parseFloat(hours.toFixed(2)),location:'confirmed on site',date:today()});
+  saveHist();
+  toast(`⏱ ${hours.toFixed(2)} hours logged`, 'ok');
+  if (current && current._id===jobId) { current=history[idx]; renderEst(current); }
+  renderDataMoat();
+}
+
+function startTimerDisplay() {
+  clearInterval(timerRef);
+  timerRef = setInterval(()=>{
+    if (!trackStart) return;
+    const s = Math.floor((Date.now()-trackStart)/1000);
+    const h = Math.floor(s/3600).toString().padStart(2,'0');
+    const m = Math.floor((s%3600)/60).toString().padStart(2,'0');
+    const sc = (s%60).toString().padStart(2,'0');
+    const el = document.getElementById('trackTimer');
+    if (el) el.textContent = `${h}:${m}:${sc}`;
+  }, 1000);
+}
+
+function showTrackBar(name) {
+  document.getElementById('trackJobName').textContent = name;
+  document.getElementById('trackBar').classList.remove('hidden');
+}
+
+// ════════════════════════════════════════════════════════
+// RECEIPT SCAN — Claude Vision, multi-job split
+// ════════════════════════════════════════════════════════
+function scanReceipt(jobId) {
+  receiptTargetJobId = jobId;
+  document.getElementById('receiptFile').value='';
+  document.getElementById('receiptFile').click();
+}
+
+async function handleReceiptFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  openReceiptModal();
+  try {
+    const b64 = await toB64(file);
+    const mime = file.type || 'image/jpeg';
+    const res = await fetch('/.netlify/functions/claude-vision', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageBase64: b64, mimeType: mime })
+    });
+    if (!res.ok) throw new Error('Receipt scan failed. Try again.');
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    let raw = (data.text || '').trim().replace(/^```json\s*/i,'').replace(/\s*```$/i,'').trim();
+    let rcpt; try { rcpt = JSON.parse(raw); } catch(e) { throw new Error('Could not read receipt. Try a clearer photo.'); }
+    pendingReceipt = rcpt.items || [];
+    renderReceiptItems(rcpt);
+  } catch(err) { closeReceiptModal(); toast(err.message, 'err'); }
+}
+
+async function parseVoice(txt, jobId) {
+  try {
+    const data = await callAnthropic(
+      'Extract structured data from a contractor job note. Return ONLY JSON: {"summary":"one sentence","hours_mentioned":null,"materials_mentioned":[],"notes":""}',
+      `Voice note: "${txt}"`
+    );
+    const idx = history.findIndex(h=>h._id===jobId);
+    if (idx<0) return;
+    if (!history[idx]._logs) history[idx]._logs=[];
+    history[idx]._logs.push({type:'voice',text:data.summary||txt.substring(0,100),raw:txt,date:today()});
+    if (data.hours_mentioned && data.hours_mentioned>0) {
+      history[idx]._logs.push({type:'gps',hours:data.hours_mentioned,location:'from voice note',date:today()});
+    }
+    saveHist();
+    toast(`Voice note: "${data.summary||txt.substring(0,50)}"`, 'ok');
+    if (current&&current._id===jobId){current=history[idx];renderEst(current);}
+    renderDataMoat();
+  } catch(e) {
+    // save raw even on parse fail
+    const idx=history.findIndex(h=>h._id===jobId);
+    if (idx>=0) {
+      if(!history[idx]._logs)history[idx]._logs=[];
+      history[idx]._logs.push({type:'voice',text:txt.substring(0,120),raw:txt,date:today()});
+      saveHist();
+      toast('Voice note saved','ok');
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// HISTORY
+// ════════════════════════════════════════════════════════
+function addHist(e) { history.unshift(e); if(history.length>100)history=history.slice(0,100); saveHist(); }
+function saveHist() {
+  try {
+    localStorage.setItem('pbhq_hist', JSON.stringify(history));
+  } catch(e) {
+    if (history.length > 20) {
+      history = history.slice(0, 20);
+      try { localStorage.setItem('pbhq_hist', JSON.stringify(history)); } catch(e2) {}
+    }
+  }
+}
+function markStatus(s,id) {
+  const i=history.findIndex(h=>h._id===id); if(i<0)return;
+  history[i]._status=s; saveHist();
+  if(current&&current._id===id){current._status=s;renderEst(current);}
+  renderHist(); renderDataMoat();
+  toast(s==='won'?'🎉 Won!':'Marked lost',s==='won'?'ok':'');
+}
+
+function renderHist() {
+  const el=document.getElementById('histGrid'); if(!el)return;
+  if (!history.length){el.innerHTML='<div class="no-hist">No estimates yet.</div>';return;}
+  const bm={won:'b-won',lost:'b-lost',pending:'b-pend'};
+  const lm={won:'Won',lost:'Lost',pending:'Pending'};
+  el.innerHTML = history.map(h=>{
+    const act=computeActuals(h);
+    const actStr = act ? `<span class="hc-data">📍${act.hrs.toFixed(1)}h + $${Math.round(act.mat)}</span>` : '';
+    return `<div class="hcard" onclick="openFromHist(${h._id})">
+      <div class="hc-row1"><div class="hc-title">${h.job_title||'Estimate'}</div><div class="hc-price">$${Math.round(h.total_bid||0).toLocaleString()}</div></div>
+      <div class="hc-meta">${h._county||h._state||''}  ·  ${h._date}  ·  ${h._live?'⚡ live':'📋 std'}</div>
+      <div class="hc-scope">${(h._scope||'').substring(0,80)}…</div>
+      <div class="hc-footer"><span class="badge ${bm[h._status]||'b-pend'}">${lm[h._status]||'Pending'}</span>${actStr}</div>
+    </div>`;
+  }).join('');
+}
+
+function openFromHist(id) {
+  const j=history.find(h=>h._id===id); if(!j)return;
+  current=j;
+  document.getElementById('scope').value=j._scope||'';
+  document.getElementById('stateSelect').value=j._state||'CA'; onStateChange();
+  document.getElementById('countyInput').value=j._county||'';
+  document.getElementById('jobType').value=j._jobType||'residential service';
+  document.getElementById('conditions').value=j._cond||'normal';
+  document.getElementById('laborFactor').value=j._factor||1.0;
+  document.getElementById('overhead').value=j._overhead||15;
+  document.getElementById('margin').value=j._margin||20;
+  document.getElementById('supplierDisc').value=j._disc||0;
+  (document.getElementById('custName')||{}).value=j._custName||'';
+  (document.getElementById('custPhone')||{}).value=j._custPhone||'';
+  (document.getElementById('custEmail')||{}).value=j._custEmail||'';
+  (document.getElementById('custAddr')||{}).value=j._custAddr||'';
+  go('estimate');
+  renderEst(j);
+  updateGenBtnState();
+}
+
+// ════════════════════════════════════════════════════════
+// DATA MOAT
+// ════════════════════════════════════════════════════════
+function renderDataMoat() {
+  const total=history.length;
+  const withActs=history.filter(h=>h._logs&&h._logs.length).length;
+  const won=history.filter(h=>h._status==='won').length;
+  const dec=history.filter(h=>h._status==='won'||h._status==='lost').length;
+  const wr=dec>0?(won/dec*100).toFixed(0)+'%':'—';
+  const dp=history.reduce((s,h)=>s+(h._logs?.length||0),0);
+
+  const byType={};
+  for (const j of history) {
+    if (!j._logs?.length) continue;
+    const lh=j._logs.filter(l=>l.type==='gps').reduce((s,l)=>s+(l.hours||0),0);
+    if (!lh || !j.total_hours) continue;
+    const f=lh/j.total_hours;
+    const t=j._jobType||'other';
+    if (!byType[t]) byType[t]={factors:[],margins:[]};
+    byType[t].factors.push(f);
+    const act=computeActuals(j);
+    if (act?.margin) byType[t].margins.push(parseFloat(act.margin));
+  }
+  const allF=Object.values(byType).flatMap(v=>v.factors);
+  const avgF=allF.length?(allF.reduce((a,b)=>a+b,0)/allF.length).toFixed(2):'—';
+  const allM=Object.values(byType).flatMap(v=>v.margins);
+  const avgM=allM.length?(allM.reduce((a,b)=>a+b,0)/allM.length).toFixed(1)+'%':'—';
+
+  document.getElementById('dm-total').textContent=total;
+  document.getElementById('dm-actuals').textContent=withActs;
+  document.getElementById('dm-wr').textContent=wr;
+  document.getElementById('dm-lf').textContent=avgF;
+  document.getElementById('dm-mg').textContent=avgM;
+  document.getElementById('dm-dp').textContent=dp;
+  autoArchiveCold();
+  var contacted=history.filter(function(h){return h._fuLog&&h._fuLog.length>0;}).length;
+  var contactedWon=history.filter(function(h){return h._fuLog&&h._fuLog.length>0&&h._status==='won';}).length;
+  var custTotal=history.filter(function(h){return h._custName||h._custPhone||h._custEmail;}).length;
+  var fuEl=document.getElementById('dm-fu');if(fuEl)fuEl.textContent=custTotal>0?(Math.round(contacted/custTotal*100)+'%'):'—';
+  var cvEl=document.getElementById('dm-conv');if(cvEl)cvEl.textContent=contacted>0?(Math.round(contactedWon/contacted*100)+'%'):'—';
+
+  const jtl=document.getElementById('jtList');
+  if (!Object.keys(byType).length){ jtl.innerHTML='<div style="font-size:.74rem;color:var(--tx3);padding:.5rem">Complete estimates with GPS/receipt data to see per-type analysis.</div>'; return; }
+  jtl.innerHTML=Object.entries(byType).map(([t,d])=>{
+    const f=(d.factors.reduce((a,b)=>a+b,0)/d.factors.length).toFixed(2);
+    const m=d.margins.length?(d.margins.reduce((a,b)=>a+b,0)/d.margins.length).toFixed(1):'—';
+    const fc=parseFloat(f)>1.1?'var(--re)':parseFloat(f)<0.9?'var(--gr)':'var(--am)';
+    var mgSpan = m!=='—' ? '<span style="color:var(--gr)">margin '+m+'%</span>' : '';
+    return '<div class="jt-row"><div class="jt-name">'+t+'</div><div class="jt-right"><span>'+d.factors.length+' jobs</span><span style="color:'+fc+'">factor '+f+'x</span>'+mgSpan+'</div></div>';
+  }).join('');
+
+  // Auto-suggest calibration
+  if (allF.length>=8) {
+    const suggested=(allF.reduce((a,b)=>a+b,0)/allF.length).toFixed(2);
+    const cur=parseFloat(document.getElementById('laborFactor')?.value||1.0);
+    if (Math.abs(parseFloat(suggested)-cur)>0.12) toast(`💡 Based on ${allF.length} jobs, suggested labor factor: ${suggested}. Set in Calibration.`,'info');
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// CALIBRATION
+// ════════════════════════════════════════════════════════
+const TEST_JOBS = {
+  panel200:{scope:'200A main panel upgrade, remove old 100A service, full service entrance replacement, utility coordination, permit pulled',jobType:'residential service'},
+  kitchen:{scope:'Kitchen remodel wiring: 4 new 20A small appliance circuits, GFCI outlets on all countertops, under-cabinet lighting circuit, range hood circuit, dishwasher dedicated circuit, 15 total outlets',jobType:'residential service'},
+  ev:{scope:'EV charger installation in attached garage: 50A dedicated circuit, 6/2 wire 40ft run, NEMA 14-50 outlet, new 50A breaker in main panel',jobType:'residential service'},
+  service:{scope:'Service call: 3 dead outlets in master bedroom, GFCI tripped at panel, troubleshoot and repair dead bedroom circuit, test all outlets',jobType:'service call/repair'}
+};
+
+function loadTest(t) {
+  const j=TEST_JOBS[t]; if(!j)return;
+  document.getElementById('scope').value=j.scope;
+  document.getElementById('jobType').value=j.jobType;
+  go('estimate'); toast('Test job loaded — click Generate','ok');
+}
+
+function calcFactor() {
+  const pb=parseFloat(document.getElementById('calPb').value);
+  const ac=parseFloat(document.getElementById('calAct').value);
+  if(!pb||!ac||pb<=0){toast('Enter both values','err');return;}
+  const f=(ac/pb).toFixed(2);
+  const d=((ac-pb)/pb*100).toFixed(1);
+  const dir=ac>pb?'higher':'lower';
+  const el=document.getElementById('calResult');
+  el.classList.add('show');
+  el.innerHTML=`<strong>Your labor factor: ${f}</strong><br>Your bids run ${Math.abs(d)}% ${dir} than ProBid's base estimate.<br><br><button class="btn btn-primary btn-sm" onclick="applyFactor(${f})">Apply factor ${f} now →</button>`;
+}
+
+function applyFactor(f) {
+  document.getElementById('laborFactor').value=f;
+  settings.laborFactor=f; safeStore('pbhq_cfg',JSON.stringify(settings));
+  toast(`Labor factor set to ${f}`, 'ok');
+}
+
+// ════════════════════════════════════════════════════════
+// OUTPUT ACTIONS
+// ════════════════════════════════════════════════════════
+function copyEst() {
+  if(!current)return;
+  const lines=(current.line_items||[]).map(l=>`${l.description}: ${l.hours}h + $${Math.round(l.material_cost||0)} mats = $${Math.round(l.total||0)}`).join('\n');
+  const txt=`${current.job_title||'Electrical Estimate'}\n${settings.company||''}\n\n${lines}\n\nTotal: $${Math.round(current.total_bid||0).toLocaleString()}\n\n${current.scope_notes||''}`;
+  navigator.clipboard.writeText(txt).then(()=>toast('Copied to clipboard','ok'));
+}
+
+function printBid() {
+  if(!current)return;
+  let w; try{w=window.open('','_blank');}catch(e){w=null;}
+  if(!w){const ifr=document.createElement('iframe');ifr.style.cssText='position:fixed;top:-9999px;left:-9999px;width:0;height:0';document.body.appendChild(ifr);w=ifr.contentWindow;setTimeout(()=>{try{document.body.removeChild(ifr);}catch(x){}},4000);}
+  const rows=(current.line_items||[]).map(function(l){
+    return '<tr><td>'+l.description+'</td><td>'+(l.hours||0).toFixed(1)+'</td><td>$'+Math.round(l.labor_cost||0)+'</td><td>$'+Math.round(l.material_cost||0)+'</td><td>$'+Math.round(l.total||0)+'</td></tr>';
+  }).join('');
+  const scopeDiv=current.scope_notes?('<div class="scope"><strong>Scope:</strong> '+current.scope_notes+'</div>'):'';
+  const permitDiv=current.permit_note?('<div class="scope"><strong>Permits:</strong> '+current.permit_note+'</div>'):'';
+  const custDiv=current._custName?('<p><strong>Customer:</strong> '+current._custName+(current._custAddr?' — '+current._custAddr:'')+'</p>'):'';
+  const html='<html><head><title>'+current.job_title+'</title><style>'
+    +'body{font-family:Arial,sans-serif;padding:2rem;font-size:13px}'
+    +'h1{font-size:1.2rem;margin-bottom:.2rem}'
+    +'.meta{font-size:.8rem;color:#666;margin-bottom:1.5rem}'
+    +'table{width:100%;border-collapse:collapse;margin:1rem 0}'
+    +'th,td{border:1px solid #ddd;padding:.4rem .6rem}'
+    +'th{background:#f5f5f5;font-size:.75rem;text-align:left}'
+    +'.total{font-size:1.2rem;font-weight:bold;color:#007a46;margin:1rem 0}'
+    +'.scope{font-size:.8rem;background:#f9f9f9;padding:.75rem;border-radius:4px;margin:1rem 0}'
+    +'</style></head><body>'
+    +'<h1>'+(current.job_title||'Electrical Estimate')+'</h1>'
+    +'<div class="meta">'+(settings.company||'')+' '+(settings.phone?'&middot; '+settings.phone:'')+' '+(settings.license?'&middot; Lic: '+settings.license:'')+'<br>'+(current._date||'')+' &middot; '+(current._county||current._state||'')+'</div>'
+    +custDiv
+    +'<table><thead><tr><th>Description</th><th>Hours</th><th>Labor</th><th>Materials</th><th>Total</th></tr></thead><tbody>'
+    +rows
+    +'</tbody></table>'
+    +'<div class="total">TOTAL BID: $'+Math.round(current.total_bid||0).toLocaleString()+'</div>'
+    +scopeDiv+permitDiv
+    +'</body></html>';
+  w.document.write(html);
+  w.document.close(); w.print();
+}
+
+function saveTmpl() {
+  if(!current)return;
+  const t=JSON.parse(localStorage.getItem('pbhq_tmpl')||'[]');
+  t.unshift({name:current.job_title,scope:current._scope,jobType:current._jobType,date:current._date});
+  if(t.length>20)t.splice(20);
+  safeStore('pbhq_tmpl',JSON.stringify(t));
+  toast('Template saved','ok');
+}
+
+// ════════════════════════════════════════════════════════
+// UI HELPERS
+// ════════════════════════════════════════════════════════
+function setLoad(on) {
+  document.getElementById('outEmpty').style.display = on?'none':(current?'none':'flex');
+  document.getElementById('outLoad').classList.toggle('hidden',!on);
+  document.getElementById('outResult').style.display = on?'none':(current?'block':'none');
+  document.getElementById('genBtn').disabled=on;
+  document.getElementById('gIcon').textContent=on?'…':'⚡';
+  document.getElementById('gTxt').textContent=on?'Generating…':'Generate estimate';
+  if(on) document.getElementById('loadMsg').textContent='Initializing…';
+}
+
+function toast(msg,type='') {
+  const w=document.getElementById('toastWrap');
+  const el=document.createElement('div');
+  el.className='toast'+(type==='ok'?' ok':type==='err'?' err':type==='info'?' info':'');
+  el.textContent=msg;
+  w.appendChild(el);
+  setTimeout(()=>el.remove(),4500);
+}
+
+function today() { return new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+
+
+
+
+// ══════════════════════════════════════════
+// ADDRESS AUTOCOMPLETE + COUNTY AUTO-FILL
+// ══════════════════════════════════════════
+
+var addrTimer = null;
+var addrResults = [];
+var addrFocused = -1;
+
+function fmtPhone(el) {
+  var digits = el.value.replace(/\D/g, '').substring(0, 10);
+  var fmt = '';
+  if (digits.length === 0) { el.value = ''; return; }
+  if (digits.length <= 3) {
+    fmt = '(' + digits;
+  } else if (digits.length <= 6) {
+    fmt = '(' + digits.substring(0,3) + ') ' + digits.substring(3);
+  } else {
+    fmt = '(' + digits.substring(0,3) + ') ' + digits.substring(3,6) + '-' + digits.substring(6);
+  }
+  el.value = fmt;
+}
+
+function addrInput(el) {
+  var q = el.value.trim();
+  var dd = document.getElementById('addrDropdown');
+  if (q.length < 4) { if (dd) dd.style.display = 'none'; return; }
+  clearTimeout(addrTimer);
+  addrTimer = setTimeout(function() { fetchAddrSuggestions(q); }, 350);
+}
+
+async function fetchAddrSuggestions(q) {
+  var dd = document.getElementById('addrDropdown');
+  if (!dd) return;
+  try {
+    var url = 'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=6&countrycodes=us&q=' + encodeURIComponent(q);
+    var res = await fetch(url, { headers: { 'Accept-Language': 'en-US' } });
+    if (!res.ok) return;
+    var data = await res.json();
+    addrResults = data;
+    addrFocused = -1;
+    if (!data.length) { dd.style.display = 'none'; return; }
+    dd.innerHTML = data.map(function(r, i) {
+      return '<div class="addr-opt" data-idx="' + i + '" onmousedown="selectAddr(' + i + ')" style="padding:.5rem .75rem;cursor:pointer;font-size:.74rem;border-bottom:1px solid var(--bd);color:var(--tx2);transition:background .08s" onmouseover="this.style.background=\'var(--bg4)\'" onmouseout="this.style.background=\'\'">'+
+        '<span style="color:var(--tx);font-weight:500">' + (r.address.house_number||'') + ' ' + (r.address.road||'') + '</span>' +
+        '<span style="color:var(--tx3);font-size:.67rem;margin-left:.4rem">' + (r.address.city||r.address.town||r.address.village||'') + ', ' + (r.address.state||'') + ' ' + (r.address.postcode||'') + '</span>' +
+        '</div>';
+    }).join('');
+    dd.style.display = 'block';
+  } catch(e) { if (dd) dd.style.display = 'none'; }
+}
+
+function selectAddr(idx) {
+  var r = addrResults[idx];
+  if (!r) return;
+  var el = document.getElementById('custAddr');
+  var dd = document.getElementById('addrDropdown');
+  // Build clean address string
+  var parts = [];
+  if (r.address.house_number) parts.push(r.address.house_number);
+  if (r.address.road) parts.push(r.address.road);
+  if (r.address.city || r.address.town || r.address.village) parts.push(r.address.city || r.address.town || r.address.village);
+  if (r.address.state_code || r.address.state) parts.push(r.address.state_code || r.address.state);
+  if (r.address.postcode) parts.push(r.address.postcode);
+  if (el) el.value = parts.join(', ');
+  if (dd) dd.style.display = 'none';
+  // Auto-fill state + county
+  autoFillFromAddr(r);
+}
+
+function autoFillFromAddr(r) {
+  // Map state name to code
+  var STATE_MAP = {
+    'California':'CA','Texas':'TX','Florida':'FL','New York':'NY','Arizona':'AZ',
+    'Colorado':'CO','Washington':'WA','Oregon':'OR','Illinois':'IL','Nevada':'NV',
+    'Georgia':'GA','North Carolina':'NC','Pennsylvania':'PA','Ohio':'OH',
+    'Massachusetts':'MA','Michigan':'MI','Virginia':'VA','Minnesota':'MN',
+    'New Jersey':'NJ','Tennessee':'TN','Missouri':'MO','Wisconsin':'WI'
+  };
+  var stateCode = r.address.state_code ? r.address.state_code.toUpperCase() : (STATE_MAP[r.address.state] || '');
+  if (stateCode) {
+    var sel = document.getElementById('stateSelect');
+    if (sel) {
+      sel.value = stateCode;
+      onStateChange(); // refresh county list
+    }
+  }
+  // Auto-fill county
+  var county = r.address.county || '';
+  if (county) {
+    var countyEl = document.getElementById('countyInput');
+    if (countyEl) countyEl.value = county;
+    // update 1build indicator
+    updateObIndicator();
+  }
+}
+
+function addrKeyDown(ev) {
+  var dd = document.getElementById('addrDropdown');
+  if (!dd || dd.style.display === 'none') return;
+  var opts = dd.querySelectorAll('.addr-opt');
+  if (ev.key === 'ArrowDown') {
+    ev.preventDefault();
+    addrFocused = Math.min(addrFocused + 1, opts.length - 1);
+    opts.forEach(function(o,i){ o.style.background = i === addrFocused ? 'var(--bg4)' : ''; });
+  } else if (ev.key === 'ArrowUp') {
+    ev.preventDefault();
+    addrFocused = Math.max(addrFocused - 1, 0);
+    opts.forEach(function(o,i){ o.style.background = i === addrFocused ? 'var(--bg4)' : ''; });
+  } else if (ev.key === 'Enter' && addrFocused >= 0) {
+    ev.preventDefault();
+    selectAddr(addrFocused);
+  } else if (ev.key === 'Escape') {
+    dd.style.display = 'none';
+  }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(ev) {
+  var dd = document.getElementById('addrDropdown');
+  var inp = document.getElementById('custAddr');
+  if (dd && inp && !dd.contains(ev.target) && ev.target !== inp) {
+    dd.style.display = 'none';
+  }
+});
+
+
+
+// ══════════════════════════════════════════════════════
+// ESTIMATE LOCK SYSTEM
+// ══════════════════════════════════════════════════════
+
+function getEstimateVersion(e) {
+  // Short version tag from the cache key — e.g. "a3f9c1b2"
+  if (!e) return '—';
+  var key = buildCacheKey(e._scope, e._state, e._county, e._jobType,
+                          e._cond, e._factor, e._overhead, e._margin, e._disc);
+  return key.replace('ec_','').substring(0,8).toUpperCase();
+}
+
+function renderLockBar(e) {
+  var ver = getEstimateVersion(e);
+  var date = e._date || '';
+  return '<div class="lock-bar locked">' +
+    '<span class="lock-ico">🔒</span>' +
+    '<div><strong>Estimate locked</strong>' +
+    '<span class="lock-detail"> — this price is fixed to these exact inputs. Change any input to unlock.</span></div>' +
+    '<span class="lock-ver">ID: ' + ver + '</span>' +
+    '</div>';
+}
+
+function updateGenBtnState() {
+  // Read current form inputs
+  var scope   = (document.getElementById('scope')      || {value:''}).value.trim();
+  var state   = (document.getElementById('stateSelect')|| {value:'CA'}).value;
+  var county  = (document.getElementById('countyInput')|| {value:''}).value;
+  var jobType = (document.getElementById('jobType')    || {value:''}).value;
+  var cond    = (document.getElementById('conditions') || {value:'normal'}).value;
+  var factor  = parseFloat((document.getElementById('laborFactor')||{value:'1'}).value)||1.0;
+  var overhead= parseFloat((document.getElementById('overhead')   ||{value:'15'}).value)||15;
+  var margin  = parseFloat((document.getElementById('margin')     ||{value:'20'}).value)||20;
+  var disc    = parseFloat((document.getElementById('supplierDisc')||{value:'0'}).value)||0;
+
+  if (!scope) {
+    setGenBtn('idle'); return;
+  }
+
+  var key    = buildCacheKey(scope, state, county, jobType, cond, factor, overhead, margin, disc);
+  var cached = getCachedEstimate(key);
+  if (cached) {
+    setGenBtn('locked');
+  } else {
+    setGenBtn('ready');
+  }
+}
+
+function setGenBtn(mode) {
+  var btn  = document.getElementById('genBtn');
+  var icon = document.getElementById('gIcon');
+  var txt  = document.getElementById('gTxt');
+  if (!btn) return;
+  if (mode === 'locked') {
+    icon.textContent = '🔒';
+    txt.textContent  = 'Locked — tap to view estimate';
+    btn.style.background = 'var(--bg4)';
+    btn.style.color      = 'var(--gr)';
+    btn.style.border     = '1px solid var(--gr3)';
+  } else if (mode === 'ready') {
+    icon.textContent = '⚡';
+    txt.textContent  = 'Generate estimate';
+    btn.style.background = '';
+    btn.style.color      = '';
+    btn.style.border     = '';
+  } else {
+    // idle — no scope
+    icon.textContent = '⚡';
+    txt.textContent  = 'Generate estimate';
+    btn.style.background = '';
+    btn.style.color      = '';
+    btn.style.border     = '';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// ESTIMATE RESPONSE CACHE
+// Same inputs always return the same estimate.
+// Uses a SHA-256-style hash of all inputs as the cache key.
+// Stored in localStorage under 'pbhq_ecache'.
+// ══════════════════════════════════════════════════════
+
+function simpleHash(str) {
+  // Fast 32-bit hash (FNV-1a variant) — no crypto API needed
+  var hash = 2166136261;
+  for (var i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = (hash * 16777619) >>> 0;
+  }
+  return hash.toString(16).padStart(8, '0');
+}
+
+function buildCacheKey(scope, state, county, jobType, cond, factor, overhead, margin, disc) {
+  // Normalise: lowercase, trim whitespace, collapse runs of spaces
+  var norm = (scope || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  var parts = [norm, state, county, jobType, cond,
+               parseFloat(factor).toFixed(2),
+               parseFloat(overhead).toFixed(0),
+               parseFloat(margin).toFixed(0),
+               parseFloat(disc).toFixed(0)];
+  return 'ec_' + simpleHash(parts.join('|'));
+}
+
+function getCachedEstimate(key) {
+  try {
+    var raw = localStorage.getItem('pbhq_ecache');
+    if (!raw) return null;
+    var cache = JSON.parse(raw);
+    return cache[key] || null;
+  } catch (e) { return null; }
+}
+
+function setCachedEstimate(key, est) {
+  try {
+    var raw = localStorage.getItem('pbhq_ecache');
+    var cache = raw ? JSON.parse(raw) : {};
+    cache[key] = est;
+    // Keep cache under 200 entries — evict oldest
+    var keys = Object.keys(cache);
+    if (keys.length > 200) {
+      delete cache[keys[0]];
+    }
+    safeStore('pbhq_ecache', JSON.stringify(cache));
+  } catch (e) { /* storage full — skip */ }
+}
+
+function invalidateCacheForCurrentInputs() {
+  // Called when user explicitly wants a fresh estimate (e.g. changed inputs)
+  // Just return — the key won't match since inputs changed
+}
+
+// ══════════════════════════════════════════════════════
+// DRIP SEQUENCE ENGINE
+// ══════════════════════════════════════════════════════
+
+// The 5-step sequence. day = days after estimate created.
+// After step 5 with no response → auto-archive as cold.
+var DRIP_STEPS = [
+  { id:1, day:1,  ch:'sms',   label:'Day 1 — quick check-in',          angle:'check-in'  },
+  { id:2, day:3,  ch:'sms',   label:'Day 3 — still available',         angle:'available' },
+  { id:3, day:7,  ch:'email', label:'Day 7 — address questions',        angle:'value'     },
+  { id:4, day:14, ch:'sms',   label:'Day 14 — schedule filling up',    angle:'urgency'   },
+  { id:5, day:30, ch:'email', label:'Day 30 — final check-in',         angle:'final'     }
+];
+
+// Build the message text for a given step + estimate
+function buildDripMsg(step, e) {
+  var name    = e._custName  || 'there';
+  var job     = e.job_title  || 'your electrical project';
+  var price   = '$' + Math.round(e.total_bid||0).toLocaleString();
+  var co      = settings.company || 'us';
+  var ph      = settings.phone   || '';
+
+  if (step.id === 1) {
+    return 'Hi ' + name + ', just wanted to make sure you received my estimate for ' + job + '. Happy to answer any questions — ' + co + (ph ? ' ' + ph : '') + '.';
+  }
+  if (step.id === 2) {
+    return 'Hi ' + name + ', following up on the quote for ' + job + ' (' + price + '). I can usually schedule within the week. Any questions? — ' + co;
+  }
+  if (step.id === 3) {
+    var lines = [
+      'Hi ' + name + ',',
+      '',
+      'I wanted to follow up on the estimate for ' + job + ' and answer a few questions I hear often:',
+      '',
+      '• What\'s included? ' + (e.scope_notes ? e.scope_notes.split('.')[0] + '.' : 'All labor, materials, and cleanup.'),
+      '• Do I need a permit? ' + (e.permit_note ? e.permit_note.split('.')[0] + '.' : 'I handle the permit process — no extra work for you.'),
+      '• How long does it take? Typically 1 day once scheduled.',
+      '',
+      'Let me know if you have questions or want to move forward.',
+      '',
+      'Thanks, ' + co + (ph ? '\n' + ph : '')
+    ];
+    return lines.join('\n');
+  }
+  if (step.id === 4) {
+    return 'Hi ' + name + ', checking back on the estimate for ' + job + '. My schedule is starting to fill into next month — happy to hold a spot if you\'re ready. No pressure either way. — ' + co;
+  }
+  if (step.id === 5) {
+    var lines5 = [
+      'Hi ' + name + ',',
+      '',
+      'This is my last follow-up on the estimate for ' + job + '. If the timing isn\'t right or you went another direction, no worries at all — I appreciate you considering us.',
+      '',
+      'If you\'d like to move forward now or in the future, just reply here.',
+      '',
+      'Thanks, ' + co + (ph ? '\n' + ph : '')
+    ];
+    return lines5.join('\n');
+  }
+  return '';
+}
+
+// Get subject line for email steps
+function getDripSubject(step, e) {
+  var job = e.job_title || 'your project';
+  var co  = settings.company || 'us';
+  if (step.id === 3) return 'Quick answers about your ' + job + ' estimate';
+  if (step.id === 5) return 'Last follow-up — ' + job + ' estimate from ' + co;
+  return 'Following up — ' + job;
+}
+
+// Days since estimate was created
+function daysSince(e) {
+  if (!e._dateRaw) return 0;
+  var ms = Date.now() - e._dateRaw;
+  return Math.floor(ms / 86400000);
+}
+
+// Get drip state for an estimate: returns array of step objects with status
+function getDripState(e) {
+  var ds = e._dripState || {};  // { stepId: 'sent'|'skipped' }
+  var days = daysSince(e);
+  return DRIP_STEPS.map(function(step) {
+    var status = ds[step.id] || 'pending';
+    var isDue  = status === 'pending' && days >= step.day;
+    return Object.assign({}, step, { status: status, isDue: isDue, days: days });
+  });
+}
+
+// Get only the NEXT due step (the earliest pending+due one)
+function getNextDueStep(e) {
+  var steps = getDripState(e);
+  for (var i = 0; i < steps.length; i++) {
+    if (steps[i].isDue) return steps[i];
+  }
+  return null;
+}
+
+// Mark a step as sent or skipped
+function markDripStep(jobId, stepId, action) {
+  var idx = history.findIndex(function(h){ return h._id === jobId; });
+  if (idx < 0) return;
+  if (!history[idx]._dripState) history[idx]._dripState = {};
+  history[idx]._dripState[stepId] = action; // 'sent' or 'skipped'
+  if (!history[idx]._fuLog) history[idx]._fuLog = [];
+  var step = DRIP_STEPS.find(function(s){ return s.id === stepId; });
+  history[idx]._fuLog.push({
+    action: (action === 'sent' ? 'Sent' : 'Skipped') + ' day-' + (step ? step.day : stepId) + ' ' + (step ? step.ch.toUpperCase() : ''),
+    date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})
+  });
+  saveHist();
+  if (current && current._id === jobId) { current = history[idx]; renderEst(current); }
+  renderFollowupPipeline();
+  updateDueBadge();
+  toast(action === 'sent' ? 'Logged as sent' : 'Skipped', 'ok');
+}
+
+// Count how many pending estimates have at least one due step
+function countDueNow() {
+  return history.filter(function(h) {
+    if (h._status !== 'pending') return false;
+    if (!h._custName && !h._custPhone && !h._custEmail) return false;
+    return getNextDueStep(h) !== null;
+  }).length;
+}
+
+// Update the badge dot + due bar
+function updateDueBadge() {
+  var n = countDueNow();
+  var dot  = document.getElementById('dripDot');
+  var bar  = document.getElementById('dueBar');
+  var cnt  = document.getElementById('dueCount');
+  if (dot) dot.classList.toggle('hidden', n === 0);
+  if (bar) bar.classList.toggle('hidden', n === 0);
+  if (cnt) cnt.textContent = n;
+}
+
+// Render the drip sequence block inside an estimate
+function renderDripBlock(e) {
+  if (!e._custName && !e._custPhone && !e._custEmail) return '';
+  if (e._status !== 'pending') return '';
+
+  var steps = getDripState(e);
+  var days  = daysSince(e);
+
+  var stepsHtml = steps.map(function(step) {
+    var cls = 'seq-step';
+    var dayCls = 'ss-day';
+    var statusTxt = '';
+    var statusCls = 'ss-status';
+    var actions = '';
+
+    if (step.status === 'sent') {
+      cls += ' sent'; statusTxt = '✓ sent'; statusCls += ' sent';
+    } else if (step.status === 'skipped') {
+      cls += ' skipped'; statusTxt = 'skipped'; 
+    } else if (step.isDue) {
+      cls += ' due'; dayCls += ' due'; statusTxt = 'DUE NOW'; statusCls += ' due';
+      var msg  = buildDripMsg(step, e);
+      var subj = getDripSubject(step, e);
+
+      if (step.ch === 'sms' && e._custPhone) {
+        actions = '<div class="ss-actions">'
+          + '<a href="sms:' + e._custPhone + '?body=' + encodeURIComponent(msg) + '" class="btn btn-or btn-sm" onclick="setTimeout(function(){markDripStep(' + e._id + ',' + step.id + ',\'sent\')},800)">📱 Open Messages</a>'
+          + '<button class="btn btn-ghost btn-sm" onclick="markDripStep(' + e._id + ',' + step.id + ',\'sent\')">✓ Mark sent</button>'
+          + '<button class="btn btn-ghost btn-sm" onclick="markDripStep(' + e._id + ',' + step.id + ',\'skipped\')">Skip</button>'
+          + '</div>'
+          + '<div class="msg-preview" style="margin-top:.45rem;font-size:.71rem">' + msg + '</div>';
+      } else if (step.ch === 'sms') {
+        actions = '<div class="ss-actions">'
+          + '<button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(' + JSON.stringify(msg) + ').then(function(){toast(\'Copied\',\'ok\')})">Copy text</button>'
+          + '<button class="btn btn-ghost btn-sm" onclick="markDripStep(' + e._id + ',' + step.id + ',\'sent\')">✓ Mark sent</button>'
+          + '<button class="btn btn-ghost btn-sm" onclick="markDripStep(' + e._id + ',' + step.id + ',\'skipped\')">Skip</button>'
+          + '</div>'
+          + '<div class="msg-preview" style="margin-top:.45rem;font-size:.71rem">' + msg + '</div>';
+      } else if (step.ch === 'email' && e._custEmail) {
+        actions = '<div class="ss-actions">'
+          + '<a href="mailto:' + e._custEmail + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(msg) + '" class="btn btn-or btn-sm" onclick="setTimeout(function(){markDripStep(' + e._id + ',' + step.id + ',\'sent\')},800)">📧 Open Mail</a>'
+          + '<button class="btn btn-ghost btn-sm" onclick="markDripStep(' + e._id + ',' + step.id + ',\'sent\')">✓ Mark sent</button>'
+          + '<button class="btn btn-ghost btn-sm" onclick="markDripStep(' + e._id + ',' + step.id + ',\'skipped\')">Skip</button>'
+          + '</div>'
+          + '<div class="msg-preview" style="margin-top:.45rem;font-size:.71rem">' + msg.replace(/\n/g,'<br>') + '</div>';
+      } else {
+        actions = '<div class="ss-actions">'
+          + '<button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(' + JSON.stringify(msg) + ').then(function(){toast(\'Copied\',\'ok\')})">Copy</button>'
+          + '<button class="btn btn-ghost btn-sm" onclick="markDripStep(' + e._id + ',' + step.id + ',\'sent\')">✓ Mark sent</button>'
+          + '<button class="btn btn-ghost btn-sm" onclick="markDripStep(' + e._id + ',' + step.id + ',\'skipped\')">Skip</button>'
+          + '</div>'
+          + '<div class="msg-preview" style="margin-top:.45rem;font-size:.71rem">' + msg.replace(/\n/g,'<br>') + '</div>';
+      }
+    } else {
+      // future step — show how many days until due
+      var daysLeft = step.day - days;
+      statusTxt = 'in ' + daysLeft + 'd';
+    }
+
+    return '<div class="' + cls + '">'
+      + '<div class="' + dayCls + '">Day ' + step.day + '</div>'
+      + '<span class="ss-channel ch-' + step.ch + '">' + step.ch.toUpperCase() + '</span>'
+      + '<div class="ss-label">' + step.label + '</div>'
+      + '<div class="' + statusCls + '">' + statusTxt + '</div>'
+      + '</div>'
+      + actions;
+  }).join('');
+
+  var allDone = steps.every(function(s){ return s.status === 'sent' || s.status === 'skipped'; });
+  var footer = allDone
+    ? '<div style="font-size:.7rem;color:var(--gr);margin-top:.55rem;padding:.4rem .6rem;background:var(--grb);border-radius:var(--r4)">✓ Full sequence complete — mark Won or Lost above to close this lead.</div>'
+    : '';
+
+  return '<div class="seq-block">'
+    + '<div class="seq-title">Follow-Up Sequence <span style="font-size:.58rem;color:var(--tx3);font-family:var(--font-mono)">Day ' + days + ' since estimate</span></div>'
+    + '<div class="seq-steps">' + stepsHtml + '</div>'
+    + footer
+    + '</div>';
+}
+
+
+// ── Auto-archive cold leads after day 30 + full sequence complete ──
+function autoArchiveCold() {
+  var changed = false;
+  history.forEach(function(h, idx) {
+    if (h._status !== 'pending') return;
+    if (!h._custName && !h._custPhone && !h._custEmail) return;
+    var days = daysSince(h);
+    if (days < 30) return;
+    var steps = getDripState(h);
+    var allDone = steps.every(function(s){ return s.status === 'sent' || s.status === 'skipped'; });
+    if (allDone) {
+      history[idx]._status = 'cold-archived';
+      history[idx]._lead   = 'cold';
+      changed = true;
+    }
+  });
+  if (changed) saveHist();
+}
+
+// ── Call updateDueBadge whenever app loads ──
+// (will be called from boot() patch below)
+
+// ══════════════════════════════════════════
+// FOLLOW-UP & MATERIAL LIST — v4 additions
+// ══════════════════════════════════════════
+
+function getCustFromForm() {
+  return {
+    _custName:  (document.getElementById('custName')  || {value:''}).value.trim(),
+    _custPhone: (document.getElementById('custPhone') || {value:''}).value.trim(),
+    _custEmail: (document.getElementById('custEmail') || {value:''}).value.trim(),
+    _custAddr:  (document.getElementById('custAddr')  || {value:''}).value.trim(),
+  };
+}
+
+function setLead(jobId, lead) {
+  const idx = history.findIndex(h => h._id === jobId);
+  if (idx < 0) return;
+  history[idx]._lead = lead;
+  saveHist();
+  if (current && current._id === jobId) { current = history[idx]; renderEst(current); }
+  renderFollowupPipeline();
+  toast('Lead marked ' + lead, 'ok');
+}
+
+function logFuAction(jobId, action) {
+  const idx = history.findIndex(h => h._id === jobId);
+  if (idx < 0) return;
+  if (!history[idx]._fuLog) history[idx]._fuLog = [];
+  history[idx]._fuLog.push({ action, date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) });
+  saveHist();
+  if (current && current._id === jobId) { current = history[idx]; renderEst(current); }
+  renderFollowupPipeline();
+  toast('Logged: ' + action, 'ok');
+}
+
+function switchFuTab(tab, jobId) {
+  ['sms','email','script'].forEach(function(t) {
+    var el  = document.getElementById('fu-' + t + '-' + jobId);
+    var btn = document.getElementById('ftab-' + t + '-' + jobId);
+    if (el)  el.classList.toggle('act', t === tab);
+    if (btn) btn.classList.toggle('act', t === tab);
+  });
+}
+
+function buildMsg(tmpl, e) {
+  return (tmpl || '')
+    .replace(/\{name\}/g,    e._custName    || 'there')
+    .replace(/\{job\}/g,     e.job_title    || 'the project')
+    .replace(/\{price\}/g,   '$' + Math.round(e.total_bid||0).toLocaleString())
+    .replace(/\{company\}/g, settings.company || 'us')
+    .replace(/\{phone\}/g,   settings.phone   || '');
+}
+
+function renderFollowupBlock(e) {
+  var hasCust = e._custName || e._custPhone || e._custEmail;
+  if (!hasCust) {
+    return '<div style="background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r8);padding:.6rem .8rem;font-size:.71rem;color:var(--tx3);margin-top:.8rem;line-height:1.6">' +
+           '💡 Add customer name + phone/email above to unlock follow-up tools.</div>';
+  }
+
+  var lead   = e._lead  || '';
+  var fuLog  = e._fuLog || [];
+  var sms1tmpl = settings.sms1 || 'Hi {name}, just checking if you had any questions about the estimate for {job}. Happy to walk you through it — {company}';
+  var sms3tmpl = settings.sms3 || 'Hi {name}, following up on the quote for {job}. Can usually schedule this week. Any questions? — {company}';
+  var subjTmpl = settings.emailSubject || 'Your estimate from {company}';
+
+  var sms1 = buildMsg(sms1tmpl, e);
+  var sms3 = buildMsg(sms3tmpl, e);
+  var subj = buildMsg(subjTmpl, e);
+
+  var emailLines = [
+    'Hi ' + (e._custName || 'there') + ',',
+    '',
+    'Thank you for taking the time to meet with me.',
+    '',
+    'I have put together a detailed estimate for your ' + (e.job_title || 'electrical project') + '. The total comes to $' + Math.round(e.total_bid||0).toLocaleString() + ', which includes all labor, materials, and our workmanship warranty.',
+    '',
+    e.scope_notes || 'Scope as discussed on site.',
+    '',
+    'I can typically schedule within 1-2 weeks of approval. Let me know if you have any questions.',
+    '',
+    'Thanks,',
+    settings.company || 'Our Team'
+  ];
+  var emailBody = emailLines.join('\n');
+
+  var scriptLines = [
+    'CALL SCRIPT',
+    '',
+    '"Hi ' + (e._custName||'[customer]') + ', this is [your name] from ' + (settings.company||'[company]') + '. Calling about the estimate for your ' + (e.job_title||'electrical project') + '. Did you get a chance to look it over?"',
+    '',
+    '[If yes] "Great — any questions on the scope or pricing?"',
+    '',
+    '[If no] "No problem. The total is $' + Math.round(e.total_bid||0).toLocaleString() + ' and covers everything we discussed. I can resend it right now."',
+    '',
+    '[Close] "I have openings this week and next — would [DAY] or [DAY] work for you?"'
+  ];
+  var callScript = scriptLines.join('\n');
+
+  var logHtml = fuLog.slice(-5).reverse().map(function(l) {
+    return '<div class="fu-log-entry"><div class="fu-log-dot"></div><span>' + l.action + ' — ' + l.date + '</span></div>';
+  }).join('');
+
+  var smsLink1 = e._custPhone ? '<a href="sms:' + e._custPhone + '?body=' + encodeURIComponent(sms1) + '" class="btn btn-or btn-sm">Open Messages</a>' : '';
+  var smsLink3 = e._custPhone ? '<a href="sms:' + e._custPhone + '?body=' + encodeURIComponent(sms3) + '" class="btn btn-ghost btn-sm">Day 3 text</a>' : '';
+  var mailLink = e._custEmail ? '<a href="mailto:' + e._custEmail + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(emailBody) + '" class="btn btn-or btn-sm">Open Mail</a>' : '';
+  var callLink = e._custPhone ? '<a href="tel:' + e._custPhone + '" class="btn btn-or btn-sm">Call now</a>' : '';
+
+  return '<div class="fu-block">' +
+    '<div class="fu-header"><div class="fu-title">Follow-Up</div>' +
+    (e._custName ? '<span style="font-size:.68rem;color:var(--tx2)">' + e._custName + (e._custPhone ? ' · ' + e._custPhone : '') + '</span>' : '') +
+    '</div>' +
+    '<div style="font-size:.68rem;color:var(--tx2);margin-bottom:.5rem">Lead temperature:</div>' +
+    '<div class="fu-score">' +
+    '<button class="fu-score-btn ' + (lead==='hot'?'hot':'') + '" onclick="setLead(' + e._id + ',\'hot\')">🔥 Hot</button>' +
+    '<button class="fu-score-btn ' + (lead==='warm'?'warm':'') + '" onclick="setLead(' + e._id + ',\'warm\')">🌤 Warm</button>' +
+    '<button class="fu-score-btn ' + (lead==='cold'?'cold':'') + '" onclick="setLead(' + e._id + ',\'cold\')">❄ Cold</button>' +
+    '</div>' +
+    '<div class="fu-tabs">' +
+    '<button class="fu-tab act" id="ftab-sms-' + e._id + '" onclick="switchFuTab(\'sms\',' + e._id + ')">💬 Text</button>' +
+    '<button class="fu-tab" id="ftab-email-' + e._id + '" onclick="switchFuTab(\'email\',' + e._id + ')">📧 Email</button>' +
+    '<button class="fu-tab" id="ftab-script-' + e._id + '" onclick="switchFuTab(\'script\',' + e._id + ')">📞 Script</button>' +
+    '</div>' +
+    // SMS TAB
+    '<div class="fu-content act" id="fu-sms-' + e._id + '">' +
+    '<div style="font-size:.65rem;color:var(--tx3);margin-bottom:.25rem">Day 1:</div>' +
+    '<div class="msg-preview">' + sms1 + '</div>' +
+    '<div class="fu-actions" style="display:flex;gap:.35rem;flex-wrap:wrap">' + smsLink1 +
+    '<button class="btn btn-ghost btn-sm" onclick="logFuAction(' + e._id + ',\'SMS day-1 sent\')">Mark sent</button>' +
+    '</div>' +
+    '<div style="font-size:.65rem;color:var(--tx3);margin:.5rem 0 .25rem">Day 3 (if no reply):</div>' +
+    '<div class="msg-preview">' + sms3 + '</div>' +
+    '<div class="fu-actions" style="display:flex;gap:.35rem;flex-wrap:wrap">' + smsLink3 +
+    '<button class="btn btn-ghost btn-sm" onclick="logFuAction(' + e._id + ',\'SMS day-3 sent\')">Mark sent</button>' +
+    '</div>' +
+    '</div>' +
+    // EMAIL TAB
+    '<div class="fu-content" id="fu-email-' + e._id + '">' +
+    '<div style="font-size:.65rem;color:var(--tx3);margin-bottom:.25rem">Subject: <strong>' + subj + '</strong></div>' +
+    '<div class="msg-preview">' + emailBody.replace(/\n/g, '<br>') + '</div>' +
+    '<div class="fu-actions" style="display:flex;gap:.35rem;flex-wrap:wrap">' + mailLink +
+    '<button class="btn btn-ghost btn-sm" onclick="logFuAction(' + e._id + ',\'Email sent\')">Mark sent</button>' +
+    '</div>' +
+    '</div>' +
+    // SCRIPT TAB
+    '<div class="fu-content" id="fu-script-' + e._id + '">' +
+    '<div class="msg-preview">' + callScript.replace(/\n/g,'<br>') + '</div>' +
+    '<div class="fu-actions" style="display:flex;gap:.35rem;flex-wrap:wrap">' + callLink +
+    '<button class="btn btn-ghost btn-sm" onclick="logFuAction(' + e._id + ',\'Call made\')">Log call</button>' +
+    '<button class="btn btn-ghost btn-sm" onclick="logFuAction(' + e._id + ',\'Voicemail left\')">VM left</button>' +
+    '</div>' +
+    '</div>' +
+    (fuLog.length ? '<div class="fu-log">' + logHtml + '</div>' : '') +
+    '</div>'
+    + renderDripBlock(e);
+}
+
+function renderFollowupPipeline() {
+  var withCust = history.filter(function(h){ return h._custName || h._custPhone || h._custEmail; });
+  var pending  = withCust.filter(function(h){ return h._status === 'pending'; });
+  var hot      = pending.filter(function(h){ return h._lead === 'hot'; });
+  var warm     = pending.filter(function(h){ return h._lead === 'warm'; });
+  var cold     = pending.filter(function(h){ return h._lead === 'cold'; });
+  var unscored = pending.filter(function(h){ return !h._lead; }).slice(0, 8);
+
+  function setC(id, n){ var el=document.getElementById(id); if(el) el.textContent=n; }
+  setC('fu-hot-count',  hot.length);
+  setC('fu-warm-count', warm.length);
+  setC('fu-cold-count', cold.length + unscored.length);
+
+  function card(h) {
+    var next = getNextDueStep(h);
+    var dueTag = next ? '<span style="font-size:.6rem;background:var(--orb);color:var(--or);border:1px solid rgba(255,140,66,.3);border-radius:3px;padding:1px 5px;font-family:var(--font-mono);margin-left:.35rem">Day ' + next.day + ' DUE</span>' : '';
+    var days = daysSince(h);
+    return '<div class="fu-card" onclick="openFromHist(' + h._id + ')">' +
+      '<div class="fu-card-name">' + (h._custName||'Unknown') + dueTag + '</div>' +
+      '<div class="fu-card-price">' + (h.job_title||'Estimate') + ' — $' + Math.round(h.total_bid||0).toLocaleString() + '</div>' +
+      '<div class="fu-card-meta">' + h._date + ' · Day ' + days + ' · ' + (h._fuLog ? h._fuLog.length : 0) + ' sent</div>' +
+      '</div>';
+  }
+
+  function setList(id, arr, emptyMsg) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = arr.length ? arr.map(card).join('') : '<div class="fu-empty">' + emptyMsg + '</div>';
+  }
+  setList('fu-hot-list',  hot,  'No hot leads');
+  setList('fu-warm-list', warm, 'No warm leads');
+  setList('fu-cold-list', cold.concat(unscored), 'No cold leads');
+}
+
+function renderMaterialList(e) {
+  if (!e.material_list || !e.material_list.length) return '';
+  var idx = history.findIndex(function(h){ return h._id===e._id; });
+  var checked = (idx>=0 && history[idx]._mlChecked) ? history[idx]._mlChecked : {};
+  var total = e.material_list.length;
+  var doneCount = Object.values(checked).filter(Boolean).length;
+  var pct = total > 0 ? Math.round(doneCount/total*100) : 0;
+
+  var rows = e.material_list.map(function(it, i) {
+    var ck = !!checked[i];
+    return '<div class="ml-item">' +
+      '<div class="ml-check ' + (ck?'checked':'') + '" onclick="toggleMlCheck(' + e._id + ',' + i + ')" style="cursor:pointer;width:15px;height:15px;border:1.5px solid var(--bd2);border-radius:3px;background:' + (ck?'var(--gr)':'var(--bg4)') + ';flex-shrink:0;display:flex;align-items:center;justify-content:center">' + (ck?'<span style="font-size:9px;color:#000;font-weight:700">&#10003;</span>':'') + '</div>' +
+      '<div class="ml-name" style="flex:1;color:var(--tx);' + (ck?'text-decoration:line-through;opacity:.4':'') + '"><strong>' + it.qty + ' ' + (it.unit||'ea') + '</strong> ' + it.item + '</div>' +
+      (it.est_cost ? '<div class="ml-price">~$' + it.est_cost.toLocaleString() + '</div>' : '') +
+      '</div>';
+  }).join('');
+
+  return '<div class="mat-list-block">' +
+    '<div class="ml-header">' +
+      '<div class="ml-title">Material List <span style="font-size:.57rem;color:var(--tx3)">(' + doneCount + '/' + total + ' checked)</span></div>' +
+      '<button class="btn btn-ghost btn-sm" style="font-size:.66rem" onclick="copyMaterialList(' + e._id + ')">Copy</button>' +
+    '</div>' +
+    '<div class="ml-items">' + rows + '</div>' +
+    '<div style="font-size:.65rem;color:var(--tx3);margin-top:.45rem">' + pct + '% purchased' +
+      '<div class="ml-bar"><div class="ml-bar-fill" style="width:' + pct + '%"></div></div>' +
+    '</div>' +
+    '</div>';
+}
+
+function toggleMlCheck(jobId, itemIdx) {
+  var idx = history.findIndex(function(h){ return h._id===jobId; });
+  if (idx < 0) return;
+  if (!history[idx]._mlChecked) history[idx]._mlChecked = {};
+  history[idx]._mlChecked[itemIdx] = !history[idx]._mlChecked[itemIdx];
+  saveHist();
+  if (current && current._id===jobId) { current=history[idx]; renderEst(current); }
+}
+
+function copyMaterialList(jobId) {
+  var e = history.find(function(h){ return h._id===jobId; });
+  if (!e || !e.material_list) return;
+  var txt = e.material_list.map(function(it){ return it.qty+' '+(it.unit||'ea')+' — '+it.item+(it.est_cost?' (~$'+it.est_cost+')':''); }).join('\n');
+  navigator.clipboard.writeText('MATERIALS: '+e.job_title+'\n'+'-'.repeat(40)+'\n'+txt).then(function(){ toast('Material list copied','ok'); });
+}
+
+
+function forceRegenerate() {
+  if (!current) return;
+  // Clear cache entry for current inputs
+  try {
+    var raw = localStorage.getItem('pbhq_ecache');
+    if (raw) {
+      var cache = JSON.parse(raw);
+      var key = buildCacheKey(current._scope, current._state, current._county,
+                               current._jobType, current._cond, current._factor,
+                               current._overhead, current._margin, current._disc);
+      delete cache[key];
+      safeStore('pbhq_ecache', JSON.stringify(cache));
+    }
+  } catch(e) {}
+  toast('Cache cleared — generating fresh estimate…', 'info');
+  generate();
+}
+
+// ════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════
+// Ensure DOM is fully ready before boot
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() { onStateChange(); boot(); });
+} else {
+  onStateChange();
+  boot();
+}
+</script>
+</body>
+</html>
